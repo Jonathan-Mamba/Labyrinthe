@@ -105,7 +105,7 @@ class Cell(pygame.sprite.Sprite):
 class Player(pygame.sprite.Sprite):
     def __init__(self, group: pygame.sprite.Group ,rect_args: dict = {}, inital_cell_index: int = 0) -> None:
         super().__init__(group)
-        self.image = pygame.image.load("assets/player.png").convert_alpha()
+        self.image = pygame.image.load("../assets/player.png").convert_alpha()
         self.rect = self.image.get_rect(**rect_args)
         self.speed = 1
         self.cell_index = inital_cell_index
