@@ -1,16 +1,15 @@
 import itertools
 import os
+import sys
 import time
 import icecream
 import numpy as np
 from colorama import Fore, init
-from laby_generator import LabWalker, close_points
+
+sys.path.append(r"C:\Users\jojod\Bureau\fichiers_python\autres\labyrinthe")
+from util.laby_generator import close_points, LabWalker
 
 init(True)
-
-color = Fore.RED
-colors = itertools.cycle([Fore.MAGENTA, Fore.GREEN, Fore.BLUE, Fore.YELLOW, Fore.RED])
-previous_point = [0, 0]
 
 
 class TerminalRenderer:
@@ -36,26 +35,61 @@ class TerminalRenderer:
         cls.content = np.full(size, char)
 
 
-def get_char(_point, _previous_point) -> str:
-    x, y = _point[0] - _previous_point[0], _point[1] - _previous_point[1]
-    if x < 0: return "←"
-    if x > 0: return "→"
-    if y < 0: return "↑"
-    if y > 0: return "↓"
-    return "+"
+def rel_pos(_point: np.ndarray, other: np.ndarray):
+    """
+    other is to the {return value} of point
+    """
+    x, y = _point - other
+    if x > 0: return "left"
+    if x < 0: return "right"
+    if y > 0: return "up"
+    if y < 0: return "down"
+    return ""
 
 
-def truc(point):
-    global colors, previous_point, color
-    if previous_point not in close_points(point):
-        color = colors.__next__()
-    TerminalRenderer.set_char(list(reversed(point)), f"{color}{get_char(point, previous_point)}")
-    os.system("cls")
-    diff = np.array(point) - np.array(previous_point)
-    icecream.ic(point, previous_point)
-    icecream.ic(diff)
-    TerminalRenderer.render()
-    previous_point = point
+def get_char(_point: np.ndarray, _previous_point: np.ndarray, _next_point: np.ndarray) -> str:
+    prev_to_curr: str = rel_pos(_point, _previous_point)
+    curr_to_next: str = rel_pos(_next_point, _point)
+    if prev_to_curr == curr_to_next:
+        _rel_pos = curr_to_next
+        if _rel_pos == "left" or _rel_pos == "right": return "─"
+        if _rel_pos == "up" or _rel_pos == "down": return "|"
+
+    elif curr_to_next == "left" and prev_to_curr == "up": return "└"
+    elif curr_to_next == "left" and prev_to_curr == "down": return "┌"
+    elif curr_to_next == "right" and prev_to_curr == "up": return "┘"
+    elif curr_to_next == "right" and prev_to_curr == "down": return "┐"
+    else:
+        return "x"
+
+
+
+class PointCreationObserver:
+    def __init__(self):
+        self.index: int = -1
+        self.color = Fore.RED
+        self.colors = itertools.cycle([Fore.MAGENTA, Fore.GREEN, Fore.BLUE, Fore.YELLOW, Fore.RED])
+        self.next_point = np.array([0, 0])
+        self.previous_point = np.array([0, 0])
+        self.current_point = np.array([0, 0])
+
+    def notify(self, point: np.ndarray[int]) -> None:
+        os.system("cls")
+        self.index += 1
+        self.previous_point = self.current_point.copy()
+        self.current_point = self.next_point.copy()
+        self.next_point = point.copy()
+
+        if [self.previous_point[0], self.previous_point[1]] not in close_points(point):
+            self.color = self.colors.__next__()
+
+        if self.index > 1:
+            TerminalRenderer.set_char(self.current_point,
+                                      f"{self.color}{get_char(self.current_point, self.previous_point, self.next_point)}")
+            TerminalRenderer.render()
+
+
+
 
 
 def to_lab_array(point_list: np.ndarray[int], lab_shape: np.ndarray) -> np.ndarray[int]:
@@ -72,7 +106,7 @@ def main():
     ]
     TerminalRenderer.fill(LAB_SIZE)
 
-    walker: LabWalker = LabWalker(np.array([[0, 0]]), [0, 0], truc)
+    walker: LabWalker = LabWalker(np.array([[0, 0]]), [0, 0], PointCreationObserver().notify)
     walker.generate(LAB_SIZE)
     print((to_lab_array(walker.point_list, LAB_SIZE)))
 

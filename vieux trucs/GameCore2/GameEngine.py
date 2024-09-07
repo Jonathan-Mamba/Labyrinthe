@@ -1,6 +1,6 @@
 import abc
 import pygame
-import Event
+from labyrinthe.gameImplemtation import Event
 
 import gameConstants
 

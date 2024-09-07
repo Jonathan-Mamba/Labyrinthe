@@ -1,9 +1,7 @@
 import pygame
 import numpy as np
 import alive_progress
-from typing import Any
-from icecream import ic
-from laby_generator import generate_lab, close_points, is_inside
+from util.laby_generator import generate_lab, close_points, is_inside
 
 
 class Game:pass

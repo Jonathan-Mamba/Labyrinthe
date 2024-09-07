@@ -4,6 +4,8 @@ note pour le moi du lendemain: ce fichier est ultra lent sa mÃ¨re jsp pk(c'esr Ã
 
 import json
 import random
+
+import icecream
 import numpy as np
 import alive_progress
 from typing import Any
@@ -38,7 +40,7 @@ class LabWalker:
         return generate_lab(size, self.start_point, easy_bt, walker=self)
 
     def at_new_cell(self, _point: point):
-        self.func(_point)
+        self.func(np.array(_point))
 
 
 def is_inside(_point: point, topleft: point, bottomright: point) -> bool:
@@ -98,7 +100,7 @@ def generate_lab(size: point, start_point=None, progress_bar: bool = False, walk
 
 
 def main() -> None:
-    with open("assets/settings.json", "r") as f:
+    with open("../../assets/settings.json", "r") as f:
         settings = json.loads(f.read())
         SIZE = [settings["labyrinthe.taille"][0], settings["labyrinthe.taille"][1]]
     laby = generate_lab(SIZE, start_point=settings["start_point"])
@@ -106,7 +108,7 @@ def main() -> None:
     log(title="liste de la bonne taille", data=len(laby) == SIZE[0] * SIZE[1], other=f"{len(laby):,}")
     log("backtrack", _backtrack_count > 0, f"{_backtrack_count:,}")
 
-    with open("assets/output.json", "w") as f:
+    with open("../../assets/output.json", "w") as f:
         f.write(json.dumps({"liste_coor": "ouias bah ca merche pas"}))
 
 

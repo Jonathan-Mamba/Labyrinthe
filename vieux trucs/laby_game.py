@@ -1,8 +1,7 @@
 import pygame
 import numpy as np
-from Cell.cell import Cell
-from icecream import ic
-from laby_generator import generate_lab
+from labyrinthe.GameCore.Cell import Cell
+from util.laby_generator import generate_lab
 
 
 class Game:
@@ -10,8 +9,8 @@ class Game:
         pygame.init()
 
         self.SCREEN_RES = np.array([640, 480])
-        self.LAB_SIZE = np.array([5, 5], dtype="int8")
-        self.BORDER_WIDTH = 12
+        self.LAB_SIZE = np.array([10, 10], dtype="int8")
+        self.BORDER_WIDTH = 8
         self.CELL_WIDTH = 4 * self.BORDER_WIDTH
         self.EXIT_COLOR = pygame.color.Color((0, 255, 0))
 
@@ -35,9 +34,9 @@ class Game:
 
     def create_cells(self) -> None:
         for index, value in enumerate(self.labyrinth):
-            ic(index, value)
+            #ic(index, value)
             cell = Cell(game=self, index=index, pos=(value * self.CELL_WIDTH + (value * self.BORDER_WIDTH)))
-            cell.resize()
+            cell.align_to_previous()
             self.cells_group.add(cell)
 
     def update(self) -> None:
@@ -49,7 +48,7 @@ class Game:
         print(self.lab_array)
         self.create_cells()
 
-    def group_draw(self, **kwds: dict[bool]):
+    def group_draw(self):
         for group in self.groups:
             group.update()
             group.draw(self.surface)

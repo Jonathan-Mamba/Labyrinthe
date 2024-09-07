@@ -5,3 +5,4 @@ class CameraTypes(enum.Enum):
     CAMERA_BOX = enum.auto()
     KEYBOARD = enum.auto()
     MOUSE = enum.auto()
+    MISC = enum.auto()

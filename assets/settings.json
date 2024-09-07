@@ -1,4 +1,4 @@
 {
-    "labyrinthe.taille": [5, 5],
+    "labyrinthe.taille": [25, 25],
     "start_point": [0, 0]
 }
