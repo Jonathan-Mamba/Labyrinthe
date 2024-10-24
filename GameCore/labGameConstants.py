@@ -1,8 +1,6 @@
 import numpy as np
-import sys
 import pygame
 from fractions import Fraction
-sys.path.append("/labyrinthe")
 from labyrinthe.GameCore.util import laby_generator
 
 
@@ -36,4 +34,3 @@ class LabGameConstants:
         self.surface: pygame.surface.Surface = pygame.Surface([10, 10])
         self.offset = np.array([0, 0], dtype=np.int16)
         self.pressed_keys: dict[int, bool] = {}
-

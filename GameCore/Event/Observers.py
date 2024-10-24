@@ -9,7 +9,6 @@ from labyrinthe.GameCore.labGameConstants import LabGameConstants as gameConsts
 
 type Event = pygame.event.Event
 
-
 def event_quit(_, game_consts: gameConsts) -> None:
     pygame.display.quit()
     pygame.quit()
@@ -32,6 +31,7 @@ def mousewheel(event: Event, game_consts: gameConsts) -> None:
     elif game_consts.zoom_scale > fractions.Fraction(2, 1):
         game_consts.zoom_scale = fractions.Fraction(2, 1)
     else:
+        print(f"zoom scale: {float(game_consts.zoom_scale)}")
         for group in game_consts.groups:
             for sprite in group:
                 sprite.zoom_behavior(game_consts, event.y)

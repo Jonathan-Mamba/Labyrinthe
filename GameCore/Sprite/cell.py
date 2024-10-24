@@ -66,8 +66,7 @@ class Cell(ICell, LabSprite):
         return f"<Cell({self.arr_index} at {self.index})>"
 
     def adjacent_indexes(self) -> list[int]: # *i = [1, 0] -> 1, 0 (unpack)
-        return [int(self.game_consts.lab_array[*i]) for i in close_points(self.arr_index) if
-                is_inside(i, [0, 0], self.game_consts.LAB_SIZE)]
+        return [int(self.game_consts.lab_array[*i]) for i in close_points(self.arr_index) if is_inside(i[::-1], [0, 0], self.game_consts.LAB_SIZE)]
 
     def relative_postion(self, other) -> str:
         """
