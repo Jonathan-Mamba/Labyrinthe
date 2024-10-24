@@ -4,12 +4,8 @@ contient la classe qui représente un point du labyrinthe
 
 import abc
 import itertools
-
 import numpy as np
 import pygame
-import sys
-
-sys.path.append("\\labyrinthe")
 from labyrinthe.GameCore.labGameConstants import LabGameConstants
 from labyrinthe.GameCore.Sprite.LabSprite import LabSprite
 
@@ -66,7 +62,10 @@ class Cell(ICell, LabSprite):
         self.arr_index: list[int, int] = list(reversed(self.game_consts.labyrinth[self.index]))
         self.fixed_pos = pygame.math.Vector2(self.rect.topleft)
 
-    def adjacent_indexes(self) -> list[int]:
+    def __repr__(self):
+        return f"<Cell({self.arr_index} at {self.index})>"
+
+    def adjacent_indexes(self) -> list[int]: # *i = [1, 0] -> 1, 0 (unpack)
         return [int(self.game_consts.lab_array[*i]) for i in close_points(self.arr_index) if
                 is_inside(i, [0, 0], self.game_consts.LAB_SIZE)]
 
@@ -110,7 +109,7 @@ class Cell(ICell, LabSprite):
 
         elif rel_pos in ("up", "down"):
             self.image = pygame.Surface(
-                np.array([self.game_consts.CELL_WIDTH, self.game_consts.CELL_WIDTH + self.game_consts.BORDER_WIDTH] * zoom_step))
+                np.array([self.game_consts.CELL_WIDTH, self.game_consts.CELL_WIDTH + self.game_consts.BORDER_WIDTH]) * zoom_step)
             self.rect = self.image.get_rect(topleft=[x, y])
             if rel_pos == "up":
                 self.rect.move_ip(0, -(self.game_consts.BORDER_WIDTH * zoom_step))
@@ -129,13 +128,17 @@ class Cell(ICell, LabSprite):
     def update(self, *args, **kwargs) -> None:
         self.rect.topleft = self.game_consts.offset + self.fixed_pos
 
-    def zoom_behavior(self, game_consts: LabGameConstants, y: int, ) -> None:
+    def zoom_behavior(self, game_consts: LabGameConstants, y: int) -> None:
         lab = self.game_consts.labyrinth
-        self.image = pygame.transform.scale(self.image,
-                                            pygame.math.Vector2(self.image.get_size()) *
-                                            (1 + y * float(game_consts.ZOOM_SCALE_STEP)))
-        self.rect = self.image.get_rect(
+        if self.index == 0:
+            self.image = pygame.transform.scale(self.image, pygame.math.Vector2(game_consts.zoom_scale * game_consts.CELL_WIDTH))
+        else:
+            # c'est à cause de cette formule compliquée que c'est pas précis
+            self.image = pygame.transform.scale_by(self.image, 1 + y * float(game_consts.ZOOM_SCALE_STEP))
+
+        self.rect = self.image.get_rect( #celle-là aussi
             topleft=(lab[self.index] * game_consts.CELL_WIDTH * float(game_consts.zoom_scale)) +
                     (lab[self.index] * game_consts.BORDER_WIDTH * float(game_consts.zoom_scale)))
+
         self.fixed_pos = pygame.math.Vector2(self.rect.topleft)
-        self.align_to_previous()
+        self.align_to_previous(float(game_consts.zoom_scale))

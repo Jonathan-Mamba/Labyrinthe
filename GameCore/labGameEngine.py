@@ -1,6 +1,6 @@
 import sys
 
-sys.path.append("/labyrinthe")
+sys.path.append("C:/Users/jojod/Bureau/fichiers_python/autres")
 from labyrinthe.GameCore.Event import Event, Observers
 from labyrinthe.GameCore import labGameConstants as gameConsts
 from labyrinthe.GameCore.Sprite.cell import Cell

@@ -25,7 +25,6 @@ def key_up(event: Event, game_consts: gameConsts) -> None:
 
 
 def mousewheel(event: Event, game_consts: gameConsts) -> None:
-    print(game_consts.zoom_scale)
     game_consts.zoom_scale += event.y * game_consts.ZOOM_SCALE_STEP
 
     if game_consts.zoom_scale <= 0:

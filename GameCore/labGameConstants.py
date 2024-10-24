@@ -6,6 +6,7 @@ sys.path.append("/labyrinthe")
 from labyrinthe.GameCore.util import laby_generator
 
 
+
 class LabGameConstants:
     def __init__(self):
         self.LAB_SIZE: np.ndarray[int] = np.array([25, 25], dtype=np.uint16)
@@ -15,9 +16,9 @@ class LabGameConstants:
         self.CELL_WIDTH = 4 * self.BORDER_WIDTH
         self.EXIT_COLOR = pygame.color.Color((0, 255, 0))
         self.OFFSET_STEP: int = 1
-        self.ZOOM_SCALE_STEP: Fraction = Fraction(1, 10)
+        self.ZOOM_SCALE_STEP: Fraction = Fraction(1, 2)
 
-        self.cells_group = pygame.sprite.Group()
+        self.cells_group: pygame.sprite.Group = pygame.sprite.Group()
         self.player_group = pygame.sprite.GroupSingle()
 
         self.lab_array = np.zeros((self.LAB_SIZE[1], self.LAB_SIZE[0]), dtype="int16")
