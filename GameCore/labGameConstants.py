@@ -1,7 +1,7 @@
 import numpy as np
 import pygame
 from fractions import Fraction
-from labyrinthe.GameCore.util import laby_generator
+from GameCore.util import laby_generator
 
 
 

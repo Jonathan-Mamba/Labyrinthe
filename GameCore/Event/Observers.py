@@ -5,7 +5,7 @@ import numpy as np
 
 sys.path.append("/labyrinthe/GameCore")
 import pygame
-from labyrinthe.GameCore.labGameConstants import LabGameConstants as gameConsts
+from GameCore.labGameConstants import LabGameConstants as gameConsts
 
 type Event = pygame.event.Event
 

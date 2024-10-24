@@ -1,9 +1,11 @@
 import sys
 
-sys.path.append("C:/Users/jojod/Bureau/fichiers_python/autres")
-from labyrinthe.GameCore.Event import Event, Observers
-from labyrinthe.GameCore import labGameConstants as gameConsts
-from labyrinthe.GameCore.Sprite.cell import Cell
+
+sys.path.append("C:/Users/jojod/Bureau/fichiers_python/autres/labyrinthe")
+from GameCore.Event import Event, Observers
+from GameCore import labGameConstants as gameConsts
+from GameCore.Sprite.cell import Cell
+from GameCore.Sprite.player import Player
 import pygame
 
 

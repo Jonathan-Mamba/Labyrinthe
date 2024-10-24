@@ -5,7 +5,7 @@ from typing import Callable
 import sys
 
 sys.path.append("/labyrinthe/GameCore")
-import labyrinthe.GameCore.labGameConstants as gameConsts
+import GameCore.labGameConstants as gameConsts
 
 
 class EventObserver:

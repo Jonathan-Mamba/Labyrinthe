@@ -6,8 +6,8 @@ import abc
 import itertools
 import numpy as np
 import pygame
-from labyrinthe.GameCore.labGameConstants import LabGameConstants
-from labyrinthe.GameCore.Sprite.LabSprite import LabSprite
+from GameCore.labGameConstants import LabGameConstants
+from GameCore.Sprite.LabSprite import LabSprite
 
 type coordinate = list[int, int]
 type point = coordinate
