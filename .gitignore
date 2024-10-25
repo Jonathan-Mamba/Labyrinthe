@@ -2,3 +2,4 @@
 vieux trucs
 assets
 .gitignore
+GameCore/util/test.py

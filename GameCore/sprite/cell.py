@@ -7,7 +7,7 @@ import itertools
 import numpy as np
 import pygame
 from GameCore.labGameConstants import LabGameConstants
-from GameCore.Sprite.LabSprite import LabSprite
+from GameCore.sprite.LabSprite import LabSprite
 
 type coordinate = list[int, int]
 type point = coordinate
