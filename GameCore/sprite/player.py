@@ -23,13 +23,11 @@ class Player(LabSprite):
         self.rect = self.image.get_rect(center=screen_center)
         self.animation_count: int = 0
         self.current_animation: PlayerAnimation = PlayerAnimation.IDLE
-        self.velocity: np.ndarray[float] = np.array([0, 0], dtype=np.float_) #fuck les Vector2 et leurs produits bizarres
+        self.velocity: pygame.math.Vector2 = pygame.math.Vector2()
 
     def update(self, *args, **kwargs):
         self.rect.topleft = (self.rect.topleft[0] + self.velocity[0], self.rect.topleft[1] + self.velocity[1])
-        if self.velocity[0] != 0 or self.velocity[1] != 0:
-            self.velocity = np.array([0, 0], dtype=np.float_)
+        if self.velocity.x != 0 or self.velocity.y != 0:
+            self.velocity = pygame.math.Vector2()
 
-    def in_camerabox(self, screen_res: np.ndarray[np.int16], camerabox_offset: int) -> bool:
-        return is_inside(self.rect.center, [camerabox_offset, camerabox_offset], screen_res - camerabox_offset)
 

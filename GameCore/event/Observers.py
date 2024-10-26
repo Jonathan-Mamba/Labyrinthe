@@ -1,5 +1,6 @@
 import fractions
 import pygame
+import icecream
 from GameCore.labGameConstants import LabGameConstants as gameConsts
 from GameCore.sprite.player import Player, PlayerAnimation
 
@@ -22,9 +23,10 @@ def player_idle(_, game_consts: gameConsts) -> None:
             player.rect.move_ip(0, 20)
 
 
-def get_fps(event: Event, game_consts: gameConsts):
+def debug(event: Event, game_consts: gameConsts):
     if event.key == pygame.K_SPACE:
-        print(game_consts.clock.get_fps())
+
+        icecream.ic(game_consts.camera_rect.left, )
 
 
 def event_quit(_, game_consts: gameConsts) -> None:
@@ -42,6 +44,7 @@ def key_up(event: Event, game_consts: gameConsts) -> None:
 
 
 def mousewheel(event: Event, game_consts: gameConsts) -> None:
+    raise PendingDeprecationWarning(">> je garde juste ce truc au cas ou mais je pense je vais l'enlever")
     game_consts.zoom_scale += event.y * game_consts.ZOOM_SCALE_STEP
 
     if game_consts.zoom_scale <= 0:

@@ -124,9 +124,6 @@ class Cell(ICell, LabSprite):
             Cell.current_color = Cell.colors.__next__()
         self.image.fill(Cell.current_color)
 
-    def update(self, *args, **kwargs) -> None:
-        self.rect.topleft = self.game_consts.offset + self.fixed_pos
-
     def zoom_behavior(self, game_consts: LabGameConstants, y: int) -> None:
         lab = self.game_consts.labyrinth
         if self.index == 0:
