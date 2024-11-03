@@ -1,4 +1,6 @@
 import fractions
+
+import numpy as np
 import pygame
 import icecream
 from GameCore.labGameConstants import LabGameConstants as gameConsts
@@ -7,15 +9,33 @@ from GameCore.sprite.player import Player, PlayerAnimation
 type Event = pygame.event.Event
 
 
+def player_key_down(event: Event, game_consts: gameConsts):
+    if event.key in (pygame.K_LEFT, pygame.K_q):
+        game_consts.player.direction = "left"
+    elif event.key in (pygame.K_RIGHT, pygame.K_d):
+        game_consts.player.direction = "right"
+    elif event.key in (pygame.K_UP, pygame.K_z):
+        game_consts.player.direction = "up"
+    elif event.key in (pygame.K_DOWN, pygame.K_s):
+        game_consts.player.direction = "down"
+
+
+def video_resize(_, game_consts: gameConsts) -> None:
+    game_consts.SCREEN_RES = np.array(pygame.display.get_window_size())
+    game_consts.camera_rect = pygame.Rect(
+        [game_consts.CAMERABOX_OFFSET, game_consts.CAMERABOX_OFFSET],
+        game_consts.SCREEN_RES - (game_consts.CAMERABOX_OFFSET * 2))
+
+
 def player_idle(_, game_consts: gameConsts) -> None:
-    player: Player = game_consts.player_group.sprite
+    player: Player = game_consts.player
     if player.current_animation == PlayerAnimation.IDLE:
         player.animation_count = (player.animation_count + 1) % 5
         player.image = player.get_image(
-            pygame.image.load("assets/player.png"),
+            pygame.image.load("assets/player.png").convert_alpha(),
             (player.animation_count, 0),
             Player.SPRITE_SIZE,
-            scale_factor=Player.SCALE_FACTOR
+            Player.SCALE_FACTOR
         )
         if player.animation_count == 1:
             player.rect.move_ip(0, -20)
@@ -25,22 +45,13 @@ def player_idle(_, game_consts: gameConsts) -> None:
 
 def debug(event: Event, game_consts: gameConsts):
     if event.key == pygame.K_SPACE:
-
-        icecream.ic(game_consts.camera_rect.left, )
+        icecream.ic(game_consts.player.rect.center - game_consts.offset)
 
 
 def event_quit(_, game_consts: gameConsts) -> None:
     pygame.display.quit()
     pygame.quit()
     game_consts.is_open = False
-
-
-def key_down(event: Event, game_consts: gameConsts) -> None:
-    game_consts.pressed_keys[event.key] = True
-
-
-def key_up(event: Event, game_consts: gameConsts) -> None:
-    game_consts.pressed_keys[event.key] = False
 
 
 def mousewheel(event: Event, game_consts: gameConsts) -> None:

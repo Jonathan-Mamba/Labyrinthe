@@ -10,12 +10,14 @@ class LabGameConstants:
         self.LAB_SIZE: np.ndarray[int] = np.array([7, 7], dtype=np.uint16)
         self.labyrinth: np.ndarray[int] = laby_generator.generate_lab(self.LAB_SIZE)
         self.EXIT = self.labyrinth[-1]
-        self.BORDER_WIDTH = 100
-        self.CELL_WIDTH = 4 * self.BORDER_WIDTH
+        self.BORDER_WIDTH = 200
+        self.CELL_WIDTH = 2 * self.BORDER_WIDTH
         self.EXIT_COLOR = pygame.color.Color((0, 255, 0))
-        self.OFFSET_STEP: float = .6
+        self.SPEED: float = 5
         self.ZOOM_SCALE_STEP: Fraction = Fraction(1, 2)
-        self.CAMERABOX_OFFSET: int = 30
+        self.CAMERABOX_OFFSET: int = 50
+        self.SCREEN_RES = np.array([640, 480])
+
         self.camera_rect: pygame.Rect = pygame.Rect([self.CAMERABOX_OFFSET, self.CAMERABOX_OFFSET],
                                                     self.SCREEN_RES - (self.CAMERABOX_OFFSET * 2))
 
@@ -25,7 +27,6 @@ class LabGameConstants:
         self.is_open: bool = False
         self.surface: pygame.surface.Surface = pygame.Surface([10, 10])
         self.offset = np.array([0, 0], dtype=np.int16)
-        self.pressed_keys: dict[int, bool] = {}
 
         self.cells_group: pygame.sprite.Group = pygame.sprite.Group()
         self.player_group: pygame.sprite.GroupSingle = pygame.sprite.GroupSingle()
@@ -42,10 +43,3 @@ class LabGameConstants:
     @property
     def player(self) -> Player:
         return self.player_group.sprite
-
-    @property
-    def SCREEN_RES(self) -> np.ndarray[int]:
-        try:
-            return np.array(pygame.display.get_window_size())
-        except pygame.error:
-            return np.array([640, 480])

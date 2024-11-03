@@ -3,7 +3,6 @@ import pygame
 import typing
 import enum
 from GameCore.sprite.LabSprite import LabSprite
-from GameCore.util.laby_generator import is_inside
 
 
 class PlayerAnimation(enum.Enum):
@@ -14,7 +13,6 @@ class PlayerAnimation(enum.Enum):
 class Player(LabSprite):
     SPRITE_SIZE = (25, 18)
     SCALE_FACTOR = 3
-    FRAMES: int = 5
 
     def __init__(self, screen_center: typing.Iterable[float | int], *groups: tuple[pygame.sprite.Group]) -> None:
         super().__init__(*groups)
@@ -24,10 +22,10 @@ class Player(LabSprite):
         self.animation_count: int = 0
         self.current_animation: PlayerAnimation = PlayerAnimation.IDLE
         self.velocity: pygame.math.Vector2 = pygame.math.Vector2()
+        self.direction: str = "right" #j'aurai pu faire une enum mais c'est un peu trop pour rien
 
     def update(self, *args, **kwargs):
-        self.rect.topleft = (self.rect.topleft[0] + self.velocity[0], self.rect.topleft[1] + self.velocity[1])
-        if self.velocity.x != 0 or self.velocity.y != 0:
-            self.velocity = pygame.math.Vector2()
+        self.rect.topleft += self.velocity
+        self.velocity = pygame.math.Vector2()
 
 
