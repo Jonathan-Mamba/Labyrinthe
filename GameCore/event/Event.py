@@ -2,17 +2,14 @@ import pprint
 
 import pygame
 from typing import Callable
-import sys
-
-sys.path.append("/labyrinthe/GameCore")
-import GameCore.labGameConstants as gameConsts
+from GameCore.labGameConstants import LabGameConstants as gameConsts
 
 
 class EventObserver:
     def __init__(self, func: Callable):
         self.func = func
 
-    def notify(self, event: pygame.event.Event, game_consts: gameConsts.LabGameConstants):
+    def notify(self, event: pygame.event.Event, game_consts: gameConsts):
         self.func(event, game_consts)
 
 
@@ -24,21 +21,16 @@ class EventSubject:
         pygame.KEYDOWN: [],
         pygame.MOUSEMOTION: [],
         pygame.MOUSEBUTTONUP: [],
-        pygame.JOYAXISMOTION: [],
-        pygame.JOYBALLMOTION: [],
-        pygame.JOYHATMOTION: [],
-        pygame.JOYBUTTONUP: [],
-        pygame.JOYBUTTONDOWN: [],
         pygame.VIDEORESIZE: [],
         pygame.VIDEOEXPOSE: [],
         pygame.USEREVENT: [],
-        pygame.MOUSEWHEEL: []
+        pygame.MOUSEWHEEL: [],
     }
 
     def __init__(self, event_dict: dict[pygame.event.Event, list[EventObserver]] = None) -> None:
         if event_dict is None:
             event_dict = EventSubject.default
-        self.event_dict = event_dict | EventSubject.default  # fusionne les deux dictionnaires avec le premier en priorité dans les merge conflits
+        self.event_dict = event_dict | EventSubject.default  # fusionne les deux dictionnaires avec le premier en priorité
 
     def notify(self, event: pygame.event.Event, game_consts: gameConsts.LabGameConstants) -> None:
         observers = self.event_dict.get(event.type, None)

@@ -5,19 +5,21 @@ import pygame
 import icecream
 from GameCore.labGameConstants import LabGameConstants as gameConsts
 from GameCore.sprite.player import Player, PlayerAnimation
+from GameCore.util import tools
 
 type Event = pygame.event.Event
 
 
 def player_key_down(event: Event, game_consts: gameConsts):
+    # from 0 to 3 clockwise starting to the right
     if event.key in (pygame.K_LEFT, pygame.K_q):
-        game_consts.player.direction = "left"
+        game_consts.player.direction = 2
     elif event.key in (pygame.K_RIGHT, pygame.K_d):
-        game_consts.player.direction = "right"
+        game_consts.player.direction = 0
     elif event.key in (pygame.K_UP, pygame.K_z):
-        game_consts.player.direction = "up"
+        game_consts.player.direction = 3
     elif event.key in (pygame.K_DOWN, pygame.K_s):
-        game_consts.player.direction = "down"
+        game_consts.player.direction = 1
 
 
 def video_resize(_, game_consts: gameConsts) -> None:
@@ -31,9 +33,9 @@ def player_idle(_, game_consts: gameConsts) -> None:
     player: Player = game_consts.player
     if player.current_animation == PlayerAnimation.IDLE:
         player.animation_count = (player.animation_count + 1) % 5
-        player.image = player.get_image(
-            pygame.image.load("assets/player.png").convert_alpha(),
-            (player.animation_count, 0),
+        player.image = tools.get_image(
+            pygame.image.load(f"assets/player_{game_consts.player.direction}.png").convert_alpha(),
+            (player.animation_count, player.direction),
             Player.SPRITE_SIZE,
             Player.SCALE_FACTOR
         )

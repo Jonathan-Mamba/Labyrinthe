@@ -8,3 +8,4 @@ GameCore/__pycache__
 GameCore/util/__pycache__
 GameCore/sprite/__pycache__
 GameCore/event/__pycache__
+.idea/

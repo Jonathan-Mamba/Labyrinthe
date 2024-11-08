@@ -35,6 +35,7 @@ class LabGameEngine:
     def add_observers(self) -> None:
         self.event_subject.add_observer(Event.EventObserver(Observers.event_quit), pygame.QUIT)
         self.event_subject.add_observer(Event.EventObserver(Observers.debug), pygame.KEYDOWN)
+        self.event_subject.add_observer(Event.EventObserver(Observers.player_key_down), pygame.KEYDOWN)
         self.event_subject.add_observer(Event.EventObserver(Observers.video_resize), pygame.VIDEORESIZE)
         self.event_subject.add_observer(Event.EventObserver(Observers.player_idle), CustomEvent.PLAYER_IDLE.value)
 
@@ -54,18 +55,18 @@ class LabGameEngine:
         except ValueError:
             pass
 
-        velocity = self.game_constants.player.velocity
+        self.game_constants.player.update()
         player_rect = self.game_constants.player.rect
         camera_rect = self.game_constants.camera_rect
 
         if player_rect.left < camera_rect.left:
-            camera_rect.left = player_rect.left + velocity.x
+            camera_rect.left = player_rect.left
         if player_rect.right > camera_rect.right:
-            camera_rect.right = player_rect.right + velocity.x
+            camera_rect.right = player_rect.right
         if player_rect.bottom > camera_rect.bottom:
-            camera_rect.bottom = player_rect.bottom + velocity.y
+            camera_rect.bottom = player_rect.bottom
         if player_rect.top < camera_rect.top:
-            camera_rect.top = player_rect.top + velocity.y
+            camera_rect.top = player_rect.top
 
         self.game_constants.offset = np.array(camera_rect.topleft) - self.game_constants.CAMERABOX_OFFSET
 
