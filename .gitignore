@@ -1,6 +1,6 @@
 *.ipynb
 vieux trucs
-assets
+assets/
 .gitignore
 GameCore/util/test.py
 __pycache__

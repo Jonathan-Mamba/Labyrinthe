@@ -1,16 +1,15 @@
-import pprint
-
 import pygame
 from typing import Callable
 from GameCore.labGameConstants import LabGameConstants as gameConsts
+from GameCore.labGameConstants import LabEngineConstants as engineConsts
 
 
 class EventObserver:
     def __init__(self, func: Callable):
         self.func = func
 
-    def notify(self, event: pygame.event.Event, game_consts: gameConsts):
-        self.func(event, game_consts)
+    def notify(self, event: pygame.event.Event, game_consts: gameConsts, engine_consts: engineConsts):
+        self.func(event, game_consts, engine_consts)
 
 
 class EventSubject:
@@ -32,13 +31,14 @@ class EventSubject:
             event_dict = EventSubject.default
         self.event_dict = event_dict | EventSubject.default  # fusionne les deux dictionnaires avec le premier en priorité
 
-    def notify(self, event: pygame.event.Event, game_consts: gameConsts.LabGameConstants) -> None:
+    def notify(self, event: pygame.event.Event, game_consts: gameConsts, engine_consts: engineConsts) -> None:
         observers = self.event_dict.get(event.type, None)
         if observers:
             for observer in observers:
-                observer.notify(event, game_consts)
+                observer.notify(event, game_consts, engine_consts)
 
     def add_observer(self, observer: EventObserver, event_type: int) -> bool:
+        """returns True if observer is not found, else returns False"""
         observers = self.event_dict.get(event_type)
         if observer in observers:
             return False

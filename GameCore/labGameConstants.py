@@ -5,7 +5,10 @@ from GameCore.util import laby_generator
 from GameCore.sprite.player import Player
 
 """
-but you played basketball right? how come you aren't perfect in any other sports??? well... whatever a sport is a sport right, they aren't that different.
+// but you played basketball right? how come you aren't perfect in any other sports??? well... whatever a sport is a sport right, they aren't that different.
+LabGameConstants et LabEngineConstants contain game data.
+the fist contains mostly immutable data that any part of the game can need
+the second contains data that only LabGameEngine and some observers need
 """
 
 
@@ -27,27 +30,6 @@ class LabGameConstants:
         for index, value in enumerate(self.labyrinth):
             self.lab_array[value[1], value[0]] = index
 
-        # data that only LabGameEngine or event.Observers should normally want
-        # someday I am going to move it to LabEngineConstants
-        # the problem is that maybe there will be edge cases where other parts of the code will want this data
-        # P.S.: why is there an autocorrect on a code editor ?
-        self.clock: pygame.time.Clock = pygame.time.Clock()
-        self.title: str = "delalos"
-        self.is_open: bool = False
-        self.surface: pygame.surface.Surface = pygame.Surface([10, 10])
-        self.offset = np.array([0, 0], dtype=np.int16)
-        self.camera_rect: pygame.Rect = pygame.Rect([self.CAMERABOX_OFFSET, self.CAMERABOX_OFFSET],
-                                                    self.SCREEN_RES - (self.CAMERABOX_OFFSET * 2))
-
-        # idk where to put this bc of the player property
-        # this is the perfect example of an edge case
-        self.cells_group: pygame.sprite.Group = pygame.sprite.Group()
-        self.player_group: pygame.sprite.GroupSingle = pygame.sprite.GroupSingle()
-        self.groups: list[pygame.sprite.Group] = [
-            self.cells_group,
-            self.player_group,
-        ]
-
     @property
     def player(self) -> Player:
         return self.player_group.sprite
@@ -55,4 +37,23 @@ class LabGameConstants:
 
 class LabEngineConstants:
     def __init__(self):
-        pass
+        # data that only LabGameEngine or event.Observers should normally want
+        # P.S.: why is there an autocorrect on a code editor ?
+        self.clock: pygame.time.Clock = pygame.time.Clock()
+        self.title: str = "delalos"
+        self.is_open: bool = False
+        self.surface: pygame.surface.Surface = pygame.Surface([10, 10])
+        self.offset = np.array([0, 0], dtype=np.int16)
+
+        self.camera_rect: pygame.Rect = None
+
+        self.cells_group: pygame.sprite.Group = pygame.sprite.Group()
+        self.player_group: pygame.sprite.GroupSingle = pygame.sprite.GroupSingle()
+        self.groups: list[pygame.sprite.Group] = [  # all the groups sorted by depth (drawn from first to last)
+            self.cells_group,
+            self.player_group,
+        ]
+
+    @property
+    def player(self) -> Player:
+        return self.player_group.sprite

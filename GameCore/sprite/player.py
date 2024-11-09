@@ -12,7 +12,7 @@ class PlayerAnimation(enum.Enum):
 
 
 class Player(LabSprite):
-    SPRITE_SIZE = (25, 18)
+    SPRITE_SIZE = (25, 21)
     SCALE_FACTOR = 3
 
     def __init__(self, screen_center: typing.Iterable[float | int], *groups: tuple[pygame.sprite.Group]) -> None:

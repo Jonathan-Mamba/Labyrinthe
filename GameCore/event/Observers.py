@@ -1,36 +1,35 @@
-import fractions
-
 import numpy as np
 import pygame
 import icecream
 from GameCore.labGameConstants import LabGameConstants as gameConsts
+from GameCore.labGameConstants import LabEngineConstants as engineConsts
 from GameCore.sprite.player import Player, PlayerAnimation
 from GameCore.util import tools
 
 type Event = pygame.event.Event
 
 
-def player_key_down(event: Event, game_consts: gameConsts):
+def player_key_down(event: Event, _, engine_consts: engineConsts):
     # from 0 to 3 clockwise starting to the right
     if event.key in (pygame.K_LEFT, pygame.K_q):
-        game_consts.player.direction = 2
+        engine_consts.player.direction = 2
     elif event.key in (pygame.K_RIGHT, pygame.K_d):
-        game_consts.player.direction = 0
+        engine_consts.player.direction = 0
     elif event.key in (pygame.K_UP, pygame.K_z):
-        game_consts.player.direction = 3
+        engine_consts.player.direction = 3
     elif event.key in (pygame.K_DOWN, pygame.K_s):
-        game_consts.player.direction = 1
+        engine_consts.player.direction = 1
 
 
-def video_resize(_, game_consts: gameConsts) -> None:
+def video_resize(_, game_consts: gameConsts, engine_consts: engineConsts) -> None:
     game_consts.SCREEN_RES = np.array(pygame.display.get_window_size())
-    game_consts.camera_rect = pygame.Rect(
+    engine_consts.camera_rect = pygame.Rect(
         [game_consts.CAMERABOX_OFFSET, game_consts.CAMERABOX_OFFSET],
         game_consts.SCREEN_RES - (game_consts.CAMERABOX_OFFSET * 2))
 
 
-def player_idle(_, game_consts: gameConsts) -> None:
-    player: Player = game_consts.player
+def player_idle(_, __, engine_consts: engineConsts) -> None:
+    player: Player = engine_consts.player
     if player.current_animation == PlayerAnimation.IDLE:
         player.animation_count = (player.animation_count + 1) % 5
         player.image = tools.get_image(
@@ -45,12 +44,12 @@ def player_idle(_, game_consts: gameConsts) -> None:
             player.rect.move_ip(0, 20)
 
 
-def debug(event: Event, game_consts: gameConsts):
+def debug(event: Event, game_consts: gameConsts, engine_consts: engineConsts):
     if event.key == pygame.K_SPACE:
-        icecream.ic(game_consts.player.rect.center - game_consts.offset)
+        print(game_consts.lab_array)
 
 
-def event_quit(_, game_consts: gameConsts) -> None:
+def event_quit(_, __, engine_consts: engineConsts) -> None:
     pygame.display.quit()
     pygame.quit()
-    game_consts.is_open = False
+    engine_consts.is_open = False
