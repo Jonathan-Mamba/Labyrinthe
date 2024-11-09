@@ -55,7 +55,7 @@ class LabGameEngine:
         except ValueError:
             pass
 
-        self.game_constants.player.update()
+        self.game_constants.player.update_velocity()
         player_rect = self.game_constants.player.rect
         camera_rect = self.game_constants.camera_rect
 

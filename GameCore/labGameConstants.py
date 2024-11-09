@@ -4,6 +4,10 @@ from fractions import Fraction
 from GameCore.util import laby_generator
 from GameCore.sprite.player import Player
 
+"""
+but you played basketball right? how come you aren't perfect in any other sports??? well... whatever a sport is a sport right, they aren't that different.
+"""
+
 
 class LabGameConstants:
     def __init__(self):
@@ -17,25 +21,23 @@ class LabGameConstants:
         self.CELL_WIDTH = 2 * self.BORDER_WIDTH
         self.EXIT_COLOR = pygame.color.Color((0, 255, 0))
         self.SPEED: float = 5
-        self.ZOOM_SCALE_STEP: Fraction = Fraction(1, 2)
         self.CAMERABOX_OFFSET: int = 50
         self.SCREEN_RES = np.array([640, 480])
-        self.camera_rect: pygame.Rect = pygame.Rect([self.CAMERABOX_OFFSET, self.CAMERABOX_OFFSET],
-                                                    self.SCREEN_RES - (self.CAMERABOX_OFFSET * 2))
         self.lab_array = np.zeros((self.LAB_SIZE[1], self.LAB_SIZE[0]), dtype="int16")
         for index, value in enumerate(self.labyrinth):
             self.lab_array[value[1], value[0]] = index
 
-        # data that only LabGameEngine should normally want
-        # someday I am going to move it to a different class
+        # data that only LabGameEngine or event.Observers should normally want
+        # someday I am going to move it to LabEngineConstants
         # the problem is that maybe there will be edge cases where other parts of the code will want this data
         # P.S.: why is there an autocorrect on a code editor ?
         self.clock: pygame.time.Clock = pygame.time.Clock()
-        self.zoom_scale: Fraction = Fraction(1, 1)
         self.title: str = "delalos"
         self.is_open: bool = False
         self.surface: pygame.surface.Surface = pygame.Surface([10, 10])
         self.offset = np.array([0, 0], dtype=np.int16)
+        self.camera_rect: pygame.Rect = pygame.Rect([self.CAMERABOX_OFFSET, self.CAMERABOX_OFFSET],
+                                                    self.SCREEN_RES - (self.CAMERABOX_OFFSET * 2))
 
         # idk where to put this bc of the player property
         # this is the perfect example of an edge case
@@ -49,3 +51,8 @@ class LabGameConstants:
     @property
     def player(self) -> Player:
         return self.player_group.sprite
+
+
+class LabEngineConstants:
+    def __init__(self):
+        pass

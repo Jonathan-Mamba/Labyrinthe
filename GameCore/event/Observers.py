@@ -34,7 +34,7 @@ def player_idle(_, game_consts: gameConsts) -> None:
     if player.current_animation == PlayerAnimation.IDLE:
         player.animation_count = (player.animation_count + 1) % 5
         player.image = tools.get_image(
-            pygame.image.load(f"assets/player_{game_consts.player.direction}.png").convert_alpha(),
+            pygame.image.load(f"assets/player.png").convert_alpha(),
             (player.animation_count, player.direction),
             Player.SPRITE_SIZE,
             Player.SCALE_FACTOR
@@ -54,18 +54,3 @@ def event_quit(_, game_consts: gameConsts) -> None:
     pygame.display.quit()
     pygame.quit()
     game_consts.is_open = False
-
-
-def mousewheel(event: Event, game_consts: gameConsts) -> None:
-    raise PendingDeprecationWarning(">> je garde juste ce truc au cas ou mais je pense je vais l'enlever")
-    game_consts.zoom_scale += event.y * game_consts.ZOOM_SCALE_STEP
-
-    if game_consts.zoom_scale <= 0:
-        game_consts.zoom_scale = game_consts.ZOOM_SCALE_STEP
-    elif game_consts.zoom_scale > fractions.Fraction(2, 1):
-        game_consts.zoom_scale = fractions.Fraction(2, 1)
-    else:
-        print(f"zoom scale: {float(game_consts.zoom_scale)}")
-        for group in game_consts.groups:
-            for sprite in group:
-                sprite.zoom_behavior(game_consts, event.y)

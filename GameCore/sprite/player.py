@@ -25,6 +25,6 @@ class Player(LabSprite):
         self.velocity: pygame.math.Vector2 = pygame.math.Vector2()
         self.direction: int = 0  # from 0 to 3 clockwise starting to the right
 
-    def update(self, *args, **kwargs):
+    def update_velocity(self):
         self.rect.topleft += self.velocity
         self.velocity = pygame.math.Vector2()

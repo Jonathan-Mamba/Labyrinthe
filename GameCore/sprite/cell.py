@@ -122,18 +122,3 @@ class Cell(ICell, LabSprite):
         if sum(abs(var)) > 1:
             Cell.current_color = Cell.colors.__next__()
         self.image.fill(Cell.current_color)
-
-    def zoom_behavior(self, game_consts: LabGameConstants, y: int) -> None:
-        lab = game_consts.labyrinth
-        if self.index == 0:
-            self.image = pygame.transform.scale(self.image, pygame.math.Vector2(game_consts.zoom_scale * game_consts.CELL_WIDTH))
-        else:
-            # c'est à cause de cette formule compliquée que c'est pas précis
-            self.image = pygame.transform.scale_by(self.image, 1 + y * float(game_consts.ZOOM_SCALE_STEP))
-
-        self.rect = self.image.get_rect( #celle-là aussi
-            topleft=(lab[self.index] * game_consts.CELL_WIDTH * float(game_consts.zoom_scale)) +
-                    (lab[self.index] * game_consts.BORDER_WIDTH * float(game_consts.zoom_scale)))
-
-        self.fixed_pos = pygame.math.Vector2(self.rect.topleft)
-        self.align_to_previous(float(game_consts.zoom_scale))
