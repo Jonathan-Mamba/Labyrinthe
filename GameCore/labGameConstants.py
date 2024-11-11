@@ -1,6 +1,5 @@
 import numpy as np
 import pygame
-from fractions import Fraction
 from GameCore.util import laby_generator
 from GameCore.sprite.player import Player
 
@@ -20,7 +19,7 @@ class LabGameConstants:
         self.LAB_SIZE: np.ndarray[int] = np.array([7, 7], dtype=np.uint16)
         self.labyrinth: np.ndarray[int] = laby_generator.generate_lab(self.LAB_SIZE)
         self.EXIT = self.labyrinth[-1]
-        self.BORDER_WIDTH = 200
+        self.BORDER_WIDTH = 300
         self.CELL_WIDTH = 2 * self.BORDER_WIDTH
         self.EXIT_COLOR = pygame.color.Color((0, 255, 0))
         self.SPEED: float = 5
@@ -30,10 +29,6 @@ class LabGameConstants:
         for index, value in enumerate(self.labyrinth):
             self.lab_array[value[1], value[0]] = index
 
-    @property
-    def player(self) -> Player:
-        return self.player_group.sprite
-
 
 class LabEngineConstants:
     def __init__(self):
@@ -42,9 +37,10 @@ class LabEngineConstants:
         self.clock: pygame.time.Clock = pygame.time.Clock()
         self.title: str = "delalos"
         self.is_open: bool = False
-        self.surface: pygame.surface.Surface = pygame.Surface([10, 10])
         self.offset = np.array([0, 0], dtype=np.int16)
 
+        # all of these values are defined in LabGameEngine.at_startup
+        self.surface: pygame.surface.Surface = None
         self.camera_rect: pygame.Rect = None
 
         self.cells_group: pygame.sprite.Group = pygame.sprite.Group()

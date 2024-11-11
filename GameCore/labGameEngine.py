@@ -22,14 +22,16 @@ class LabGameEngine:
         self.engine_constants.surface = pygame.display.set_mode(self.game_constants.SCREEN_RES, pygame.RESIZABLE)
         pygame.display.set_caption(self.engine_constants.title)
 
-        self.engine_constants.player_group.sprite = Player(self.game_constants.SCREEN_RES / 2)
+        self.set_timers()
+        self.create_cells()
+        self.add_observers()
+
+        self.engine_constants.player_group.sprite = Player(self.engine_constants.cells_group.sprites()[0].rect.center)
         self.engine_constants.camera_rect = pygame.Rect(
             [self.game_constants.CAMERABOX_OFFSET, self.game_constants.CAMERABOX_OFFSET],
             self.game_constants.SCREEN_RES - (self.game_constants.CAMERABOX_OFFSET * 2)
         )
-        self.set_timers()
-        self.create_cells()
-        self.add_observers()
+
 
     def create_cells(self) -> None:
         for index, value in enumerate(self.game_constants.labyrinth):

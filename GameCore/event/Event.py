@@ -28,8 +28,9 @@ class EventSubject:
 
     def __init__(self, event_dict: dict[pygame.event.Event, list[EventObserver]] = None) -> None:
         if event_dict is None:
-            event_dict = EventSubject.default
-        self.event_dict = event_dict | EventSubject.default  # fusionne les deux dictionnaires avec le premier en priorité
+            self.event_dict = EventSubject.default
+        else:
+            self.event_dict = event_dict | EventSubject.default  # fuses the dicts with the first one in priority
 
     def notify(self, event: pygame.event.Event, game_consts: gameConsts, engine_consts: engineConsts) -> None:
         observers = self.event_dict.get(event.type, None)

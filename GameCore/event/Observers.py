@@ -20,6 +20,12 @@ def player_key_down(event: Event, _, engine_consts: engineConsts):
     elif event.key in (pygame.K_DOWN, pygame.K_s):
         engine_consts.player.direction = 1
 
+    if event.key == pygame.K_SPACE:
+        if engine_consts.player.current_animation == PlayerAnimation.IDLE:
+            engine_consts.player.current_animation = PlayerAnimation.BASE_ATTACK
+        else:
+            engine_consts.player.current_animation = PlayerAnimation.IDLE
+
 
 def video_resize(_, game_consts: gameConsts, engine_consts: engineConsts) -> None:
     game_consts.SCREEN_RES = np.array(pygame.display.get_window_size())
@@ -33,7 +39,7 @@ def player_idle(_, __, engine_consts: engineConsts) -> None:
     if player.current_animation == PlayerAnimation.IDLE:
         player.animation_count = (player.animation_count + 1) % 5
         player.image = tools.get_image(
-            pygame.image.load(f"assets/player.png").convert_alpha(),
+            pygame.image.load(f"assets/player/idle.png").convert_alpha(),
             (player.animation_count, player.direction),
             Player.SPRITE_SIZE,
             Player.SCALE_FACTOR
@@ -45,7 +51,7 @@ def player_idle(_, __, engine_consts: engineConsts) -> None:
 
 
 def debug(event: Event, game_consts: gameConsts, engine_consts: engineConsts):
-    if event.key == pygame.K_SPACE:
+    if event.key == pygame.K_TAB:
         print(game_consts.lab_array)
 
 
