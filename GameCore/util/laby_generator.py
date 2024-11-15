@@ -4,7 +4,7 @@ import alive_progress
 from typing import Any
 from colorama import Fore
 
-type point = list[int] | np.ndarray[int]
+type point = list[int] | np.ndarray[int] | tuple[int, int]
 
 
 def log(title: str, data: Any, other: Any = "") -> None:

@@ -52,6 +52,9 @@ def player_idle(_, __, engine_consts: engineConsts) -> None:
 
 def debug(event: Event, game_consts: gameConsts, engine_consts: engineConsts):
     if event.key == pygame.K_TAB:
+        print(game_consts.lab_array[(4, 6)])
+        print(game_consts.branch_array)
+        print("-------------------------------")
         print(game_consts.lab_array)
 
 

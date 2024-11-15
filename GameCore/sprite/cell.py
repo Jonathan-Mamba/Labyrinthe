@@ -58,7 +58,7 @@ class Cell(ICell, LabSprite):
         self.rect = self.image.get_rect()
         self.rect.topleft = pos
         self.index = index
-        self.arr_index: list[int, int] = list(reversed(labyrinth[self.index]))
+        self.arr_index: list[int] = list(reversed(labyrinth[self.index]))
         self.fixed_pos = pygame.math.Vector2(self.rect.topleft)
 
     def __repr__(self):

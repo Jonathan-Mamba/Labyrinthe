@@ -1,6 +1,7 @@
 import pygame
 import numpy as np
 import typing
+from .misc import Direction
 
 
 def get_image(sprite_sheet: pygame.Surface,
@@ -15,3 +16,22 @@ def get_image(sprite_sheet: pygame.Surface,
     image = pygame.transform.scale_by(image, scale_factor)
     image.set_colorkey(color)
     return image
+
+
+def get_relative_postion(a: typing.Iterable, b: typing.Iterable) -> Direction:
+    """
+    relative position of b to a
+    b is in the right of a (east), b is on top of a (north), b is lower than a (south)...
+    y axis goes down
+    """
+    x_delta = a[0] - b[0]
+    y_delta = a[1] - b[1]
+    if x_delta < 0:
+        return Direction.EAST
+    if x_delta > 0:
+        return Direction.WEST
+    if y_delta < 0:
+        return Direction.SOUTH
+    if y_delta > 0:
+        return Direction.NORTH
+    return Direction.NONE

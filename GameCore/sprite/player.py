@@ -35,7 +35,7 @@ class Player(LabSprite):
         return self._current_animation
 
     @current_animation.setter
-    def current_animation(self, value: PlayerAnimation):
+    def current_animation(self, value: PlayerAnimation) -> None:
         if self._current_animation == PlayerAnimation.IDLE and self.animation_count in (1, 2):
             self.rect.move_ip(0, 20)
 

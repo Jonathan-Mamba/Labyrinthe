@@ -19,15 +19,21 @@ class LabGameConstants:
         self.LAB_SIZE: np.ndarray[int] = np.array([7, 7], dtype=np.uint16)
         self.labyrinth: np.ndarray[int] = laby_generator.generate_lab(self.LAB_SIZE)
         self.EXIT = self.labyrinth[-1]
-        self.BORDER_WIDTH = 300
-        self.CELL_WIDTH = 2 * self.BORDER_WIDTH
-        self.EXIT_COLOR = pygame.color.Color((0, 255, 0))
+        self.FRAMERATE: int = 120
+        self.BORDER_WIDTH = 50  # I think that I should stop modifying these values bc otherwise it's gonna fuck everything up
+        self.CELL_WIDTH = 2 * self.BORDER_WIDTH  # 600
+        self.WALL_WIDTH = self.CELL_WIDTH / 6  # 120
         self.SPEED: float = 5
         self.CAMERABOX_OFFSET: int = 50
         self.SCREEN_RES = np.array([640, 480])
         self.lab_array = np.zeros((self.LAB_SIZE[1], self.LAB_SIZE[0]), dtype="int16")
+        self.branch_array = np.array([0], dtype=np.int16)  # contains the indexes where a new branch start
+        prev_value = np.zeros(2)
         for index, value in enumerate(self.labyrinth):
+            if sum(abs(prev_value - value)) > 1:
+                self.branch_array = np.append(self.branch_array, index)
             self.lab_array[value[1], value[0]] = index
+            prev_value = value
 
 
 class LabEngineConstants:
@@ -44,9 +50,11 @@ class LabEngineConstants:
         self.camera_rect: pygame.Rect = None
 
         self.cells_group: pygame.sprite.Group = pygame.sprite.Group()
-        self.player_group: pygame.sprite.GroupSingle = pygame.sprite.GroupSingle()
+        self.walls_group: pygame.sprite.Group = pygame.sprite.Group()
+        self.player_group: pygame.sprite.GroupSingle[Player] = pygame.sprite.GroupSingle()
         self.groups: list[pygame.sprite.Group] = [  # all the groups sorted by depth (drawn from first to last)
             self.cells_group,
+            self.walls_group,
             self.player_group,
         ]
 
