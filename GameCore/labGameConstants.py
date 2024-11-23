@@ -51,10 +51,12 @@ class LabEngineConstants:
 
         self.cells_group: pygame.sprite.Group = pygame.sprite.Group()
         self.walls_group: pygame.sprite.Group = pygame.sprite.Group()
+        self.junction_group: pygame.sprite.Group = pygame.sprite.Group()
         self.player_group: pygame.sprite.GroupSingle[Player] = pygame.sprite.GroupSingle()
         self.groups: list[pygame.sprite.Group] = [  # all the groups sorted by depth (drawn from first to last)
             self.cells_group,
             self.walls_group,
+            self.junction_group,
             self.player_group,
         ]
 

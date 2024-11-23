@@ -5,7 +5,4 @@ import icecream
 import numpy as np
 
 if __name__ == '__main__':
-    x = y = 5
-    print(x, y)
-    y = 10
-    print(x, y)
+    print(tuple(reversed(np.array([0, 0]))))

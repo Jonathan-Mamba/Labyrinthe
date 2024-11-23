@@ -4,7 +4,6 @@ import typing
 import enum
 from GameCore.sprite.LabSprite import LabSprite
 from GameCore.util import tools
-from GameCore.util.misc import Direction
 
 
 class PlayerAnimation(enum.Enum):

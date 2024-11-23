@@ -5,10 +5,11 @@ from GameCore import labGameConstants as gameConsts
 from GameCore.sprite.cell import Cell
 from GameCore.sprite.player import Player
 from GameCore.sprite.wall import Wall
+from GameCore.sprite.junction import Junction
 from GameCore.event.custom import custom_event_dict, CustomEvent
 from GameCore.util.laby_generator import close_points, is_inside
-from GameCore.util.misc import Direction
 from GameCore.util import tools
+from GameCore.util.tools import Direction
 import pygame
 
 
@@ -20,7 +21,7 @@ class LabGameEngine:
         self.event_subject: Event.EventSubject = event_subject
 
     def set_timers(self) -> None:
-        pygame.time.set_timer(pygame.event.Event(CustomEvent.PLAYER_IDLE.value), 80)
+        pygame.time.set_timer(pygame.event.Event(CustomEvent.PLAYER_IDLE), 80)
 
     def at_startup(self) -> None:
         self.engine_constants.surface = pygame.display.set_mode(self.game_constants.SCREEN_RES, pygame.RESIZABLE)
@@ -28,7 +29,7 @@ class LabGameEngine:
 
         self.set_timers()
         self.create_cells()
-        self.create_walls()
+        self.create_junctions()
         self.add_observers()
 
         self.engine_constants.player_group.sprite = Player(self.engine_constants.cells_group.sprites()[0].rect.center)
@@ -41,8 +42,25 @@ class LabGameEngine:
         for index, value in enumerate(self.game_constants.labyrinth):
             cell = Cell(self.game_constants.CELL_WIDTH, self.game_constants.labyrinth, index=index,
                         pos=(value * self.game_constants.CELL_WIDTH + (value * self.game_constants.BORDER_WIDTH)))
-            cell.align_to_previous(self.game_constants)
+            cell.set_color(self.game_constants)
             self.engine_constants.cells_group.add(cell)
+
+    def create_junctions(self) -> None:
+        cells: list[Cell] = self.engine_constants.cells_group.sprites()
+        lab_array = self.game_constants.lab_array
+        for cell in cells[1::]:
+            # write it down on a piece of paper (I know this looks bad)
+            adjacent_cells = [i[::-1] for i in close_points(self.game_constants.labyrinth[cell.index])
+                              if is_inside(i, (0, 0), self.game_constants.LAB_SIZE)]
+            max_index: int = 0
+            for i in adjacent_cells:
+                # if i is right next or right before cell in order:
+                if abs(lab_array[*i] - cell.index) <= 1:
+                    cell.edges.add(tools.get_relative_postion(cell.arr_index, cells[lab_array[*i]].arr_index))
+                if cell.index in self.game_constants.branch_array and cell.index > lab_array[*i] > max_index:
+                    max_index = lab_array[*i]
+            if cell.index in self.game_constants.branch_array:
+                cell.edges.add(tools.get_relative_postion(cell.arr_index, self.game_constants.labyrinth[max_index]))
 
     def create_walls(self) -> None:
         for var in self.engine_constants.cells_group:
@@ -76,13 +94,12 @@ class LabGameEngine:
                         icecream.ic(cell.index)
                         break
 
-
     def add_observers(self) -> None:
         self.event_subject.add_observer(Event.EventObserver(Observers.event_quit), pygame.QUIT)
         self.event_subject.add_observer(Event.EventObserver(Observers.debug), pygame.KEYDOWN)
         self.event_subject.add_observer(Event.EventObserver(Observers.player_key_down), pygame.KEYDOWN)
         self.event_subject.add_observer(Event.EventObserver(Observers.video_resize), pygame.VIDEORESIZE)
-        self.event_subject.add_observer(Event.EventObserver(Observers.player_idle), CustomEvent.PLAYER_IDLE.value)
+        self.event_subject.add_observer(Event.EventObserver(Observers.player_idle), CustomEvent.PLAYER_IDLE)
 
     def process_movement(self) -> None:
         pressed_keys = pygame.key.get_pressed()

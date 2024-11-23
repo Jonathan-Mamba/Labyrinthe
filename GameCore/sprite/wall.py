@@ -19,7 +19,7 @@ class Wall(LabSprite):
 
         if file_path:
             self.image = pygame.transform.scale(
-                pygame.transform.rotate(pygame.image.load(file_path), rotation_angle), image_size)
+                pygame.transform.rotate(pygame.image.load(file_path).convert_alpha(), rotation_angle), image_size)
         else:
             self.image = pygame.Surface(image_size)
         self.rect = self.image.get_rect(topleft=topleft)

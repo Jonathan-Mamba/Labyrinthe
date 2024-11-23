@@ -1,10 +1,11 @@
 import numpy as np
 import pygame
+import threading
 import icecream
 from GameCore.labGameConstants import LabGameConstants as gameConsts
 from GameCore.labGameConstants import LabEngineConstants as engineConsts
 from GameCore.sprite.player import Player, PlayerAnimation
-from GameCore.util import tools
+from GameCore.util import tools, misc
 
 type Event = pygame.event.Event
 
@@ -52,10 +53,14 @@ def player_idle(_, __, engine_consts: engineConsts) -> None:
 
 def debug(event: Event, game_consts: gameConsts, engine_consts: engineConsts):
     if event.key == pygame.K_TAB:
-        print(game_consts.lab_array[(4, 6)])
         print(game_consts.branch_array)
         print("-------------------------------")
         print(game_consts.lab_array)
+    elif event.key == pygame.K_p:
+        def f():
+            cell = engine_consts.cells_group.sprites()[int(input("index: "))]
+            print(cell.arr_index, cell.edges)
+        threading.Thread(target=f).start()
 
 
 def event_quit(_, __, engine_consts: engineConsts) -> None:

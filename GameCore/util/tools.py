@@ -35,3 +35,7 @@ def get_relative_postion(a: typing.Iterable, b: typing.Iterable) -> Direction:
     if y_delta > 0:
         return Direction.NORTH
     return Direction.NONE
+
+
+def get_inverse_direction(direction: Direction | int) -> Direction:
+    return Direction((direction + 4) % 8)
