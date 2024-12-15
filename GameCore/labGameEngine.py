@@ -20,23 +20,22 @@ class LabGameEngine:
         self.engine_constants: gameConsts.LabEngineConstants = engine_constants  # if it could this would be private
         self.event_subject: Event.EventSubject = event_subject
 
-    def set_timers(self) -> None:
-        pygame.time.set_timer(pygame.event.Event(CustomEvent.PLAYER_IDLE), 80)
-
     def at_startup(self) -> None:
         self.engine_constants.surface = pygame.display.set_mode(self.game_constants.SCREEN_RES, pygame.RESIZABLE)
         pygame.display.set_caption(self.engine_constants.title)
 
-        self.set_timers()
-        self.create_cells()
-        self.create_junctions()
-        self.add_observers()
+        pygame.time.set_timer(CustomEvent.PLAYER_IDLE, 80)
 
-        self.engine_constants.player_group.sprite = Player(self.engine_constants.cells_group.sprites()[0].rect.center)
         self.engine_constants.camera_rect = pygame.Rect(
             [self.game_constants.CAMERABOX_OFFSET, self.game_constants.CAMERABOX_OFFSET],
             self.game_constants.SCREEN_RES - (self.game_constants.CAMERABOX_OFFSET * 2)
         )
+
+        # TODO: why not generate a "WorldMap" image at startup instead of recreating it at each frame ?
+        self.create_cells()
+        self.create_junctions()
+        self.engine_constants.player_group.sprite = Player(self.engine_constants.cells_group.sprites()[0].rect.center)
+        self.add_observers()
 
     def create_cells(self) -> None:
         for index, value in enumerate(self.game_constants.labyrinth):
@@ -48,19 +47,43 @@ class LabGameEngine:
     def create_junctions(self) -> None:
         cells: list[Cell] = self.engine_constants.cells_group.sprites()
         lab_array = self.game_constants.lab_array
+        # filling cell.edges
         for cell in cells[1::]:
             # write it down on a piece of paper (I know this looks bad)
             adjacent_cells = [i[::-1] for i in close_points(self.game_constants.labyrinth[cell.index])
-                              if is_inside(i, (0, 0), self.game_constants.LAB_SIZE)]
+                              if is_inside(i, (0, 0), self.game_constants.LAB_SHAPE)]
             max_index: int = 0
             for i in adjacent_cells:
                 # if i is right next or right before cell in order:
                 if abs(lab_array[*i] - cell.index) <= 1:
-                    cell.edges.add(tools.get_relative_postion(cell.arr_index, cells[lab_array[*i]].arr_index))
-                if cell.index in self.game_constants.branch_array and cell.index > lab_array[*i] > max_index:
+                    cell.edges.add((
+                        tools.get_relative_position(cell.arr_index, cells[lab_array[*i]].arr_index), lab_array[*i] < cell.index
+                    ))
+                # if cell starts a new branch and max_index < lab_array[i] < cell.index
+                elif cell.index in self.game_constants.branch_array and max_index < lab_array[*i] < cell.index:
                     max_index = lab_array[*i]
             if cell.index in self.game_constants.branch_array:
-                cell.edges.add(tools.get_relative_postion(cell.arr_index, self.game_constants.labyrinth[max_index]))
+                cell.edges.add((tools.get_relative_position(cell.arr_index, self.game_constants.labyrinth[max_index]), True))
+            # creating Junctions
+            for direction, is_before in cell.edges:
+                if is_before:
+                    junction_topleft = None
+                    if direction == Direction.NORTH:
+                        junction_topleft = cell.rect.topleft - pygame.Vector2(0, self.game_constants.BORDER_WIDTH)
+                    elif direction == Direction.SOUTH:
+                        junction_topleft = cell.rect.bottomleft
+                    elif direction == Direction.WEST:
+                        junction_topleft = cell.rect.topleft - pygame.Vector2(self.game_constants.BORDER_WIDTH, 0)
+                    elif direction == Direction.EAST:
+                        junction_topleft = cell.rect.topright
+
+                    self.engine_constants.junction_group.add(Junction(
+                        self.game_constants.CELL_WIDTH,
+                        self.game_constants.BORDER_WIDTH,
+                        cell.color,
+                        direction in (Direction.WEST, Direction.EAST),
+                        junction_topleft
+                    ))
 
     def create_walls(self) -> None:
         for var in self.engine_constants.cells_group:
@@ -69,15 +92,15 @@ class LabGameEngine:
             # write it down on a piece of paper (I know this looks bad)
             for i in close_points(self.game_constants.labyrinth[cell.index]):
                 # if i is in labyrinth:
-                if is_inside(i, (0, 0), self.game_constants.LAB_SIZE):
+                if is_inside(i, (0, 0), self.game_constants.LAB_SHAPE):
                     # if i is right next or right before cell in order:
                     if abs(self.game_constants.lab_array[*reversed(i)] - cell.index) <= 1:
-                        directions = np.append(directions, tools.get_relative_postion(tuple(reversed(cell.arr_index)), i))
+                        directions = np.append(directions, tools.get_relative_position(tuple(reversed(cell.arr_index)), i))
 
                     # if cell marks a new branch and cell is after i:
                     elif cell.index in self.game_constants.branch_array and (
                             cell.index > self.game_constants.lab_array[*reversed(i)]):
-                        directions = np.append(directions, tools.get_relative_postion(tuple(reversed(cell.arr_index)), i))
+                        directions = np.append(directions, tools.get_relative_position(tuple(reversed(cell.arr_index)), i))
 
             if directions.size == 0:
                 continue
@@ -99,7 +122,7 @@ class LabGameEngine:
         self.event_subject.add_observer(Event.EventObserver(Observers.debug), pygame.KEYDOWN)
         self.event_subject.add_observer(Event.EventObserver(Observers.player_key_down), pygame.KEYDOWN)
         self.event_subject.add_observer(Event.EventObserver(Observers.video_resize), pygame.VIDEORESIZE)
-        self.event_subject.add_observer(Event.EventObserver(Observers.player_idle), CustomEvent.PLAYER_IDLE)
+        self.event_subject.add_observer(Event.EventObserver(self.engine_constants.player.animate), CustomEvent.PLAYER_IDLE)
 
     def process_movement(self) -> None:
         pressed_keys = pygame.key.get_pressed()

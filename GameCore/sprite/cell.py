@@ -46,24 +46,27 @@ class Cell(LabSprite):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface([cell_width, cell_width])
         self.image.fill(color)
-        self._color = color
+        self.color = color
         self.rect = self.image.get_rect(topleft=pos)
         self.index = index
         self.arr_index: np.ndarray[int] = labyrinth[self.index]
-        self.edges: set[Direction] = set()
+        # le bool indique si la cellule dans cette direction est avant self
+        # juste j'ai eu besion d'un set à un moment mais plus mnt (ca marche menfou)
+        self.edges: set[tuple[Direction, bool]] = set()
 
     def __repr__(self):
         return f"<Cell({self.arr_index} at {self.index})>"
 
     def copy(self, cell_width: int, lab: np.ndarray[int]) -> typing.Self:
-        return Cell(cell_width, lab, self.index, self.rect.topleft, self._color)
+        return Cell(cell_width, lab, self.index, self.rect.topleft, self.color)
 
     def get_previous(self, cell_width: int, lab: np.ndarray[int]) -> typing.Self:
-        return Cell(cell_width, lab, self.index - 1, self.rect.topleft, self._color)
+        return Cell(cell_width, lab, self.index - 1, self.rect.topleft, self.color)
 
     def set_color(self, game_consts: LabGameConstants):  # visualizes different branches
         lab = game_consts.labyrinth
         var = lab[self.index] - lab[self.get_previous(game_consts.CELL_WIDTH, game_consts.labyrinth).index]
         if sum(abs(var)) > 1:
             Cell.current_color = Cell.colors.__next__()
-        self.image.fill(Cell.current_color)
+        self.color = Cell.current_color
+        self.image.fill(self.color)

@@ -8,25 +8,26 @@ from GameCore.sprite.player import Player
 LabGameConstants et LabEngineConstants contain game data.
 the fist contains mostly immutable data that any part of the game can need
 the second contains data that only LabGameEngine and some observers need
+both classes are supposed to be singletons and their instances should be obtained through LabGameEngine or EventObserver
 """
 
 
 class LabGameConstants:
     def __init__(self):
         # data that any part of the of game would want and shouldn't be set
-        # this is python, not java: I'm too lazy to write get methods for allat
-        # also maybe, I said maybe there will be times when I need to change their value (camera_rect for example)
-        self.LAB_SIZE: np.ndarray[int] = np.array([7, 7], dtype=np.uint16)
-        self.labyrinth: np.ndarray[int] = laby_generator.generate_lab(self.LAB_SIZE)
+        # this is not java: I won't write get methods for allat (maybe that I'll need to put a lock on this though)
+        # also maybe, I said maybe there will be times when I need to change their value
+        self.LAB_SHAPE: np.ndarray[int] = np.array([7, 7], dtype=np.uint16)
+        self.labyrinth: np.ndarray[int] = laby_generator.generate_lab(self.LAB_SHAPE)
         self.EXIT = self.labyrinth[-1]
         self.FRAMERATE: int = 120
-        self.BORDER_WIDTH = 50  # I think that I should stop modifying these values bc otherwise it's gonna fuck everything up
+        self.BORDER_WIDTH = 300  # I think that I should stop modifying these values bc otherwise it's gonna fuck everything up
         self.CELL_WIDTH = 2 * self.BORDER_WIDTH  # 600
         self.WALL_WIDTH = self.CELL_WIDTH / 6  # 120
         self.SPEED: float = 5
         self.CAMERABOX_OFFSET: int = 50
         self.SCREEN_RES = np.array([640, 480])
-        self.lab_array = np.zeros((self.LAB_SIZE[1], self.LAB_SIZE[0]), dtype="int16")
+        self.lab_array = np.zeros((self.LAB_SHAPE[1], self.LAB_SHAPE[0]), dtype="int16")
         self.branch_array = np.array([0], dtype=np.int16)  # contains the indexes where a new branch start
         prev_value = np.zeros(2)
         for index, value in enumerate(self.labyrinth):

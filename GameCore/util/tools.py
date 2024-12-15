@@ -18,7 +18,7 @@ def get_image(sprite_sheet: pygame.Surface,
     return image
 
 
-def get_relative_postion(a: typing.Iterable, b: typing.Iterable) -> Direction:
+def get_relative_position(a: typing.Iterable, b: typing.Iterable) -> Direction:
     """
     relative position of b to a
     b is in the right of a (east), b is on top of a (north), b is lower than a (south)...
@@ -38,4 +38,12 @@ def get_relative_postion(a: typing.Iterable, b: typing.Iterable) -> Direction:
 
 
 def get_inverse_direction(direction: Direction | int) -> Direction:
-    return Direction((direction + 4) % 8)
+    return Direction((direction + 4) % 8) if direction != 8 else Direction.NONE
+
+
+def get_clockwise(direction: int | Direction, times: int) -> Direction:
+    return Direction((direction + times) % 8) if direction != 8 else Direction.NONE
+
+
+def get_anticlockwise(direction: Direction | int, times: int) -> Direction:
+    return Direction((direction - times + 8) % 8) if direction != 8 else Direction.NONE

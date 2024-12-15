@@ -12,3 +12,6 @@ class Junction(LabSprite):
             self.image = pygame.Surface((cell_width, border_width))
         self.image.fill(color)
         self.rect = self.image.get_rect(topleft=topleft)
+
+    def __repr__(self) -> str:
+        return f"<Junction({self.rect.topleft}, {self.is_vertical})>"
