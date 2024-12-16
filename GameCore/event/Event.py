@@ -1,7 +1,7 @@
 import pygame
 from typing import Callable
-from GameCore.labGameConstants import LabGameConstants as gameConsts
-from GameCore.labGameConstants import LabEngineConstants as engineConsts
+from GameCore.constants import LabGameConstants as gameConsts
+from GameCore.constants import LabEngineConstants as engineConsts
 
 
 class EventObserver:

@@ -18,10 +18,10 @@ class LabGameConstants:
         # this is not java: I won't write get methods for allat (maybe that I'll need to put a lock on this though)
         # also maybe, I said maybe there will be times when I need to change their value
         self.LAB_SHAPE: np.ndarray[int] = np.array([7, 7], dtype=np.uint16)
-        self.labyrinth: np.ndarray[int] = laby_generator.generate_lab(self.LAB_SHAPE)
+        self.labyrinth: np.ndarray[int] = laby_generator.generate_lab(self.LAB_SHAPE, seed=0)
         self.EXIT = self.labyrinth[-1]
         self.FRAMERATE: int = 120
-        self.BORDER_WIDTH = 300  # I think that I should stop modifying these values bc otherwise it's gonna fuck everything up
+        self.BORDER_WIDTH = 50  # I think that I should stop modifying these values bc otherwise it's gonna fuck everything up
         self.CELL_WIDTH = 2 * self.BORDER_WIDTH  # 600
         self.WALL_WIDTH = self.CELL_WIDTH / 6  # 120
         self.SPEED: float = 5
@@ -51,12 +51,12 @@ class LabEngineConstants:
         self.camera_rect: pygame.Rect = None
 
         self.cells_group: pygame.sprite.Group = pygame.sprite.Group()
-        self.walls_group: pygame.sprite.Group = pygame.sprite.Group()
+        self.wall_group: pygame.sprite.Group = pygame.sprite.Group()
         self.junction_group: pygame.sprite.Group = pygame.sprite.Group()
-        self.player_group: pygame.sprite.GroupSingle[Player] = pygame.sprite.GroupSingle()
+        self.player_group: pygame.sprite.GroupSingle = pygame.sprite.GroupSingle()
         self.groups: list[pygame.sprite.Group] = [  # all the groups sorted by depth (drawn from first to last)
             self.cells_group,
-            self.walls_group,
+            self.wall_group,
             self.junction_group,
             self.player_group,
         ]

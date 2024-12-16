@@ -1,23 +1,24 @@
+import typing
 import numpy as np
 import icecream
 from GameCore.event import Event, Observers
-from GameCore import labGameConstants as gameConsts
+from GameCore import constants
 from GameCore.sprite.cell import Cell
 from GameCore.sprite.player import Player
 from GameCore.sprite.wall import Wall
 from GameCore.sprite.junction import Junction
 from GameCore.event.custom import custom_event_dict, CustomEvent
 from GameCore.util.laby_generator import close_points, is_inside
-from GameCore.util import tools
+from GameCore.util import tools, misc
 from GameCore.util.tools import Direction
 import pygame
 
 
 class LabGameEngine:
-    def __init__(self, game_constants: gameConsts.LabGameConstants, engine_constants: gameConsts.LabEngineConstants,
+    def __init__(self, game_constants: constants.LabGameConstants, engine_constants: constants.LabEngineConstants,
                  event_subject: Event.EventSubject) -> None:
-        self.game_constants: gameConsts.LabGameConstants = game_constants
-        self.engine_constants: gameConsts.LabEngineConstants = engine_constants  # if it could this would be private
+        self.game_constants: constants.LabGameConstants = game_constants
+        self.engine_constants: constants.LabEngineConstants = engine_constants  # if it could this would be private
         self.event_subject: Event.EventSubject = event_subject
 
     def at_startup(self) -> None:
@@ -34,6 +35,7 @@ class LabGameEngine:
         # TODO: why not generate a "WorldMap" image at startup instead of recreating it at each frame ?
         self.create_cells()
         self.create_junctions()
+        self.create_walls()
         self.engine_constants.player_group.sprite = Player(self.engine_constants.cells_group.sprites()[0].rect.center)
         self.add_observers()
 
@@ -48,7 +50,7 @@ class LabGameEngine:
         cells: list[Cell] = self.engine_constants.cells_group.sprites()
         lab_array = self.game_constants.lab_array
         # filling cell.edges
-        for cell in cells[1::]:
+        for cell in cells:
             # write it down on a piece of paper (I know this looks bad)
             adjacent_cells = [i[::-1] for i in close_points(self.game_constants.labyrinth[cell.index])
                               if is_inside(i, (0, 0), self.game_constants.LAB_SHAPE)]
@@ -57,17 +59,19 @@ class LabGameEngine:
                 # if i is right next or right before cell in order:
                 if abs(lab_array[*i] - cell.index) <= 1:
                     cell.edges.add((
-                        tools.get_relative_position(cell.arr_index, cells[lab_array[*i]].arr_index), lab_array[*i] < cell.index
+                        tools.get_relative_position(cell.arr_index, cells[lab_array[*i]].arr_index),
+                        lab_array[*i] < cell.index
                     ))
                 # if cell starts a new branch and max_index < lab_array[i] < cell.index
                 elif cell.index in self.game_constants.branch_array and max_index < lab_array[*i] < cell.index:
                     max_index = lab_array[*i]
-            if cell.index in self.game_constants.branch_array:
-                cell.edges.add((tools.get_relative_position(cell.arr_index, self.game_constants.labyrinth[max_index]), True))
+            if cell.index in self.game_constants.branch_array and cell.index != 0:
+                cell.edges.add(
+                    (tools.get_relative_position(cell.arr_index, self.game_constants.labyrinth[max_index]), True))
             # creating Junctions
             for direction, is_before in cell.edges:
                 if is_before:
-                    junction_topleft = None
+                    junction_topleft = cell.rect.topleft
                     if direction == Direction.NORTH:
                         junction_topleft = cell.rect.topleft - pygame.Vector2(0, self.game_constants.BORDER_WIDTH)
                     elif direction == Direction.SOUTH:
@@ -77,6 +81,7 @@ class LabGameEngine:
                     elif direction == Direction.EAST:
                         junction_topleft = cell.rect.topright
 
+                    # PTN MAIS CA MENERVE CES WARNING CA REND TOUT MOCHE ET JE TROUVE PAS LE MOYEN DE REGLER LE PEOBLEME
                     self.engine_constants.junction_group.add(Junction(
                         self.game_constants.CELL_WIDTH,
                         self.game_constants.BORDER_WIDTH,
@@ -85,44 +90,60 @@ class LabGameEngine:
                         junction_topleft
                     ))
 
-    def create_walls(self) -> None:
-        for var in self.engine_constants.cells_group:
-            cell: Cell = var
-            directions: np.ndarray = np.array([])
-            # write it down on a piece of paper (I know this looks bad)
-            for i in close_points(self.game_constants.labyrinth[cell.index]):
-                # if i is in labyrinth:
-                if is_inside(i, (0, 0), self.game_constants.LAB_SHAPE):
-                    # if i is right next or right before cell in order:
-                    if abs(self.game_constants.lab_array[*reversed(i)] - cell.index) <= 1:
-                        directions = np.append(directions, tools.get_relative_position(tuple(reversed(cell.arr_index)), i))
+    def create_walls(self):
+        # TODO: will merge all of the walls into one giant sprite
+        for a in self.engine_constants.cells_group.sprites():
+            cell: Cell = a
+            lab_array = self.game_constants.lab_array
+            edges: list[int] = list(i[0] for i in cell.edges)
+            is_inside_lab: typing.Callable[[misc.int_pos], bool] = lambda x: is_inside(x, (0, 0), self.game_constants.LAB_SHAPE)
 
-                    # if cell marks a new branch and cell is after i:
-                    elif cell.index in self.game_constants.branch_array and (
-                            cell.index > self.game_constants.lab_array[*reversed(i)]):
-                        directions = np.append(directions, tools.get_relative_position(tuple(reversed(cell.arr_index)), i))
+            adjacent_branch_cell = None
+            for point in close_points(self.game_constants.labyrinth[cell.index]):
+                if is_inside_lab(point):
+                    if lab_array[*point[::-1]] in self.game_constants.branch_array and lab_array[*point[::-1]] > cell.index:
+                        adjacent_branch_cell = point
 
-            if directions.size == 0:
-                continue
-            elif directions.size == 1:
-                self.engine_constants.walls_group.add(Wall(cell.rect.topleft, 1, directions[0], cell.rect.size))
-            elif directions.size == 2:
-                continue
-            elif directions.size == 3:
-                for i in (0, 2, 4, 6):
-                    if i not in directions:
-                        self.engine_constants.walls_group.add(
-                            Wall(cell.rect.topleft, 3, i, cell.rect.size)
-                        )
-                        icecream.ic(cell.index)
-                        break
+            if adjacent_branch_cell is not None:
+                # les cellules qui se trouvent après cell dans l'ordre et a coté de adjacent_branch_cell
+                max_index: int = 0
+                for point in close_points(adjacent_branch_cell):
+                    # max_index < lab_array[point] < lab_array[adjacent_branch_cell]
+                    if is_inside_lab(point) and max_index < lab_array[*point[::-1]] < lab_array[*adjacent_branch_cell[::-1]]:
+                        max_index = lab_array[*reversed(point)]
+
+                if max_index == cell.index:
+                    edges.append(tools.get_relative_position(cell.arr_index, adjacent_branch_cell))
+
+                    adjacent_branch_index = lab_array[*adjacent_branch_cell[::-1]]
+                    icecream.ic(cell.index, cell.arr_index, adjacent_branch_cell, adjacent_branch_index, edges)
+
+            if len(edges) == 1:
+                self.engine_constants.wall_group.add(Wall(
+                    cell.rect.topleft, 1,
+                    edges[0], pygame.Vector2(self.game_constants.CELL_WIDTH)
+                ))
+            elif len(edges) == 2:
+                self.engine_constants.wall_group.add(Wall(
+                    cell.rect.topleft, 2,
+                    edges[0], pygame.Vector2(self.game_constants.CELL_WIDTH), edges[1]
+                ))
+            elif len(edges) == 3:
+                direction: int = Direction([i for i in (0, 2, 4, 6) if i not in edges][0])  # y'en a qu'un
+                icecream.ic(direction)
+                self.engine_constants.wall_group.add(Wall(cell.rect.topleft, 3, direction,
+                                                          pygame.Vector2(self.game_constants.CELL_WIDTH)))
+
+
+
 
     def add_observers(self) -> None:
         self.event_subject.add_observer(Event.EventObserver(Observers.event_quit), pygame.QUIT)
         self.event_subject.add_observer(Event.EventObserver(Observers.debug), pygame.KEYDOWN)
         self.event_subject.add_observer(Event.EventObserver(Observers.player_key_down), pygame.KEYDOWN)
         self.event_subject.add_observer(Event.EventObserver(Observers.video_resize), pygame.VIDEORESIZE)
-        self.event_subject.add_observer(Event.EventObserver(self.engine_constants.player.animate), CustomEvent.PLAYER_IDLE)
+        self.event_subject.add_observer(Event.EventObserver(self.engine_constants.player.animate),
+                                        CustomEvent.PLAYER_IDLE)
 
     def process_movement(self) -> None:
         pressed_keys = pygame.key.get_pressed()
@@ -136,7 +157,8 @@ class LabGameEngine:
             self.engine_constants.player.velocity.y += 1
 
         try:
-            self.engine_constants.player.velocity = (self.engine_constants.player.velocity.normalize() * self.game_constants.SPEED)
+            self.engine_constants.player.velocity = (
+                    self.engine_constants.player.velocity.normalize() * self.game_constants.SPEED)
         except ValueError:
             pass
 
@@ -162,7 +184,8 @@ class LabGameEngine:
             group.update(self.game_constants)
             for sprite in group:
                 self.engine_constants.surface.blit(sprite.image, -self.engine_constants.offset + sprite.rect.topleft)
-        pygame.draw.rect(self.engine_constants.surface, [255, 255, 255], pygame.Rect((0, 0), (self.game_constants.WALL_WIDTH, self.game_constants.WALL_WIDTH)), width=3)
+        pygame.draw.rect(self.engine_constants.surface, [255, 255, 255],
+                         pygame.Rect((0, 0), (self.game_constants.WALL_WIDTH, self.game_constants.WALL_WIDTH)), width=3)
 
     def main(self) -> None:
         pygame.init()
@@ -177,5 +200,5 @@ class LabGameEngine:
 
 
 if __name__ == "__main__":
-    LabGameEngine(gameConsts.LabGameConstants(), gameConsts.LabEngineConstants(),
+    LabGameEngine(constants.LabGameConstants(), constants.LabEngineConstants(),
                   Event.EventSubject(custom_event_dict)).main()

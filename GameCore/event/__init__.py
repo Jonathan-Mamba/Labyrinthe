@@ -1,3 +1,3 @@
 import pygame
-from GameCore.labGameConstants import LabGameConstants as gameConsts
+from GameCore.constants import LabGameConstants as gameConsts
 #event

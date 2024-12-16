@@ -7,7 +7,7 @@ import typing
 import itertools
 import numpy as np
 import pygame
-from GameCore.labGameConstants import LabGameConstants
+from GameCore.constants import LabGameConstants
 from GameCore.sprite.LabSprite import LabSprite
 from GameCore.util.tools import Direction
 type coordinate = typing.SupportsIndex[int]

@@ -3,7 +3,6 @@ import numpy as np
 import alive_progress
 from typing import Any
 from colorama import Fore
-
 type point = list[int] | np.ndarray[int] | tuple[int, int]
 
 
@@ -64,10 +63,12 @@ def choose_next_point(walker: LabWalker, size: list) -> point:
     return random.choice(next_points)
 
 
-def generate_lab(size: point, start_point=None, progress_bar: bool = False, walker: LabWalker = None) -> np.ndarray[int]:
+def generate_lab(size: point, start_point=None, progress_bar: bool = False, walker: LabWalker = None, seed: int | None = None) -> np.ndarray[int]:
     """
     retourne une liste de coordonnées qui permet de générer un labyrinthe dans un repère avec [0, 0] le point le plus en haut à gauche du plan.
     """
+    if seed is not None:
+        random.seed(seed)
     if start_point is None:
         start_point = [0, 0]
 

@@ -3,8 +3,8 @@ import pygame
 import threading
 import icecream
 import math
-from GameCore.labGameConstants import LabGameConstants as gameConsts
-from GameCore.labGameConstants import LabEngineConstants as engineConsts
+from GameCore.constants import LabGameConstants as gameConsts
+from GameCore.constants import LabEngineConstants as engineConsts
 from GameCore.sprite.player import Player, PlayerAnimation, IdleState, BaseAttackState
 from GameCore.util import tools
 
@@ -38,7 +38,10 @@ def video_resize(_, game_consts: gameConsts, engine_consts: engineConsts) -> Non
 
 def debug(event: Event, game_consts: gameConsts, engine_consts: engineConsts):
     if event.key == pygame.K_TAB:
-        icecream.ic(engine_consts.player.velocity)
+        print(game_consts.branch_array, "\n-----------------------------")
+        print(game_consts.lab_array)
+    if event.key == pygame.K_p:
+        threading.Thread(target=lambda: print(engine_consts.cells_group.sprites()[int(input("index: "))].edges)).start()
 
 
 def event_quit(_, __, engine_consts: engineConsts) -> None:
