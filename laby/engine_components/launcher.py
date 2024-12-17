@@ -1,27 +1,25 @@
-import typing
-import numpy as np
-import icecream
-from GameCore.event import Event, Observers
-from GameCore import constants
-from GameCore.sprite.cell import Cell
-from GameCore.sprite.player import Player
-from GameCore.sprite.wall import Wall
-from GameCore.sprite.junction import Junction
-from GameCore.event.custom import custom_event_dict, CustomEvent
-from GameCore.util.laby_generator import close_points, is_inside
-from GameCore.util import tools, misc
-from GameCore.util.tools import Direction
 import pygame
+from typing import Callable, Iterable
+from laby.constants import LabGameConstants, LabEngineConstants
+from laby.event.custom import CustomEvent
+from laby.engine_components import EngineObserver
+from laby.util.laby_generator import is_inside, close_points
+from laby.sprite import Cell, Wall, Junction, Player
+from laby.util import tools, misc
+from laby.util.misc import Direction
+from laby.event import EventObserver
 
 
-class LabGameEngine:
-    def __init__(self, game_constants: constants.LabGameConstants, engine_constants: constants.LabEngineConstants,
-                 event_subject: Event.EventSubject) -> None:
-        self.game_constants: constants.LabGameConstants = game_constants
-        self.engine_constants: constants.LabEngineConstants = engine_constants  # if it could this would be private
-        self.event_subject: Event.EventSubject = event_subject
+class Launcher:
+    """
+    Singleton object responsible for all the tasks at startup
+    """
+    def __init__(self, gc: LabGameConstants, ec: LabEngineConstants):
+        self.game_constants = gc
+        self.engine_constants = ec
+        self.is_inside_rect: Callable[[Iterable[int | float]], bool] = lambda x: is_inside(x, (0, 0), gc.LAB_SHAPE)
 
-    def at_startup(self) -> None:
+    def start(self):
         self.engine_constants.surface = pygame.display.set_mode(self.game_constants.SCREEN_RES, pygame.RESIZABLE)
         pygame.display.set_caption(self.engine_constants.title)
 
@@ -37,29 +35,24 @@ class LabGameEngine:
         self.create_junctions()
         self.create_walls()
         self.engine_constants.player_group.sprite = Player(self.engine_constants.cells_group.sprites()[0].rect.center)
-        self.add_observers()
 
     def create_cells(self) -> None:
+        lab_array = self.game_constants.lab_array
         for index, value in enumerate(self.game_constants.labyrinth):
             cell = Cell(self.game_constants.CELL_WIDTH, self.game_constants.labyrinth, index=index,
                         pos=(value * self.game_constants.CELL_WIDTH + (value * self.game_constants.BORDER_WIDTH)))
-            cell.set_color(self.game_constants)
+            cell.set_color(self.game_constants.CELL_WIDTH, self.game_constants.labyrinth)
             self.engine_constants.cells_group.add(cell)
 
-    def create_junctions(self) -> None:
-        cells: list[Cell] = self.engine_constants.cells_group.sprites()
-        lab_array = self.game_constants.lab_array
-        # filling cell.edges
-        for cell in cells:
-            # write it down on a piece of paper (I know this looks bad)
-            adjacent_cells = [i[::-1] for i in close_points(self.game_constants.labyrinth[cell.index])
+            # filling cell.edges
+            adjacent_cells = [list(reversed(i)) for i in close_points(self.game_constants.labyrinth[cell.index])
                               if is_inside(i, (0, 0), self.game_constants.LAB_SHAPE)]
             max_index: int = 0
             for i in adjacent_cells:
                 # if i is right next or right before cell in order:
                 if abs(lab_array[*i] - cell.index) <= 1:
                     cell.edges.add((
-                        tools.get_relative_position(cell.arr_index, cells[lab_array[*i]].arr_index),
+                        tools.get_relative_position(cell.arr_index, list(reversed(i))),
                         lab_array[*i] < cell.index
                     ))
                 # if cell starts a new branch and max_index < lab_array[i] < cell.index
@@ -68,6 +61,13 @@ class LabGameEngine:
             if cell.index in self.game_constants.branch_array and cell.index != 0:
                 cell.edges.add(
                     (tools.get_relative_position(cell.arr_index, self.game_constants.labyrinth[max_index]), True))
+
+    def create_junctions(self) -> None:
+        cells: list[Cell] = self.engine_constants.cells_group.sprites()
+        # filling cell.edges
+        for cell in cells:
+            # write it down on a piece of paper (I know this looks bad)
+
             # creating Junctions
             for direction, is_before in cell.edges:
                 if is_before:
@@ -92,11 +92,12 @@ class LabGameEngine:
 
     def create_walls(self):
         # TODO: will merge all of the walls into one giant sprite
+        # TODO: write some object or func to transfrom of all the *x[::-1] to func(x) or Index(x)
         for a in self.engine_constants.cells_group.sprites():
             cell: Cell = a
             lab_array = self.game_constants.lab_array
             edges: list[int] = list(i[0] for i in cell.edges)
-            is_inside_lab: typing.Callable[[misc.int_pos], bool] = lambda x: is_inside(x, (0, 0), self.game_constants.LAB_SHAPE)
+            is_inside_lab: Callable[[misc.int_pos], bool] = lambda x: is_inside(x, (0, 0), self.game_constants.LAB_SHAPE)
 
             adjacent_branch_cell = None
             for point in close_points(self.game_constants.labyrinth[cell.index]):
@@ -110,13 +111,10 @@ class LabGameEngine:
                 for point in close_points(adjacent_branch_cell):
                     # max_index < lab_array[point] < lab_array[adjacent_branch_cell]
                     if is_inside_lab(point) and max_index < lab_array[*point[::-1]] < lab_array[*adjacent_branch_cell[::-1]]:
-                        max_index = lab_array[*reversed(point)]
+                        max_index = lab_array[*point[::-1]]
 
                 if max_index == cell.index:
                     edges.append(tools.get_relative_position(cell.arr_index, adjacent_branch_cell))
-
-                    adjacent_branch_index = lab_array[*adjacent_branch_cell[::-1]]
-                    icecream.ic(cell.index, cell.arr_index, adjacent_branch_cell, adjacent_branch_index, edges)
 
             if len(edges) == 1:
                 self.engine_constants.wall_group.add(Wall(
@@ -130,75 +128,5 @@ class LabGameEngine:
                 ))
             elif len(edges) == 3:
                 direction: int = Direction([i for i in (0, 2, 4, 6) if i not in edges][0])  # y'en a qu'un
-                icecream.ic(direction)
                 self.engine_constants.wall_group.add(Wall(cell.rect.topleft, 3, direction,
                                                           pygame.Vector2(self.game_constants.CELL_WIDTH)))
-
-
-
-
-    def add_observers(self) -> None:
-        self.event_subject.add_observer(Event.EventObserver(Observers.event_quit), pygame.QUIT)
-        self.event_subject.add_observer(Event.EventObserver(Observers.debug), pygame.KEYDOWN)
-        self.event_subject.add_observer(Event.EventObserver(Observers.player_key_down), pygame.KEYDOWN)
-        self.event_subject.add_observer(Event.EventObserver(Observers.video_resize), pygame.VIDEORESIZE)
-        self.event_subject.add_observer(Event.EventObserver(self.engine_constants.player.animate),
-                                        CustomEvent.PLAYER_IDLE)
-
-    def process_movement(self) -> None:
-        pressed_keys = pygame.key.get_pressed()
-        if pressed_keys[pygame.K_LEFT] or pressed_keys[pygame.K_q]:
-            self.engine_constants.player.velocity.x -= 1
-        if pressed_keys[pygame.K_RIGHT] or pressed_keys[pygame.K_d]:
-            self.engine_constants.player.velocity.x += 1
-        if pressed_keys[pygame.K_UP] or pressed_keys[pygame.K_z]:
-            self.engine_constants.player.velocity.y -= 1
-        if pressed_keys[pygame.K_DOWN] or pressed_keys[pygame.K_s]:
-            self.engine_constants.player.velocity.y += 1
-
-        try:
-            self.engine_constants.player.velocity = (
-                    self.engine_constants.player.velocity.normalize() * self.game_constants.SPEED)
-        except ValueError:
-            pass
-
-        self.engine_constants.player.update_velocity()
-        player_rect = self.engine_constants.player.rect
-        camera_rect = self.engine_constants.camera_rect
-
-        if player_rect.left < camera_rect.left:
-            camera_rect.left = player_rect.left
-        if player_rect.right > camera_rect.right:
-            camera_rect.right = player_rect.right
-        if player_rect.bottom > camera_rect.bottom:
-            camera_rect.bottom = player_rect.bottom
-        if player_rect.top < camera_rect.top:
-            camera_rect.top = player_rect.top
-
-        self.engine_constants.offset = np.array(camera_rect.topleft) - self.game_constants.CAMERABOX_OFFSET
-
-    def update(self) -> None:
-        self.process_movement()
-        pygame.draw.rect(self.engine_constants.surface, [0, 0, 0], pygame.Rect([0, 0], self.game_constants.SCREEN_RES))
-        for group in self.engine_constants.groups:
-            group.update(self.game_constants)
-            for sprite in group:
-                self.engine_constants.surface.blit(sprite.image, -self.engine_constants.offset + sprite.rect.topleft)
-        pygame.draw.rect(self.engine_constants.surface, [255, 255, 255],
-                         pygame.Rect((0, 0), (self.game_constants.WALL_WIDTH, self.game_constants.WALL_WIDTH)), width=3)
-
-    def main(self) -> None:
-        pygame.init()
-        self.at_startup()
-        self.engine_constants.is_open = True
-        while self.engine_constants.is_open:
-            self.update()
-            self.engine_constants.clock.tick(self.game_constants.FRAMERATE)
-            pygame.display.flip()
-            for event in pygame.event.get():
-                self.event_subject.notify(event, self.game_constants, self.engine_constants)
-
-
-if __name__ == "__main__":
-    LabGameEngine(constants.LabGameConstants(), constants.LabEngineConstants(),
-                  Event.EventSubject(custom_event_dict)).main()

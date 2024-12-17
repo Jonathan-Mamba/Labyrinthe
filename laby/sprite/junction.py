@@ -1,5 +1,5 @@
 import pygame
-from GameCore.sprite.LabSprite import LabSprite
+from laby.sprite.LabSprite import LabSprite
 
 
 class Junction(LabSprite):

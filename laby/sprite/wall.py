@@ -1,7 +1,7 @@
 import pygame
-from GameCore.sprite.LabSprite import LabSprite
-from GameCore.util.misc import int_pos, Direction
-import GameCore.util.tools as tools
+from laby.sprite.LabSprite import LabSprite
+from laby.util.misc import int_pos, Direction
+import laby.util.tools as tools
 
 
 class Wall(LabSprite):

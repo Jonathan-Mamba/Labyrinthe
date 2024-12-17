@@ -1,7 +1,7 @@
 import numpy as np
 import pygame
-from GameCore.util import laby_generator
-from GameCore.sprite.player import Player
+from laby.util import laby_generator
+from laby.sprite.player import Player
 
 """
 // but you played basketball right? how come you aren't perfect in any other sports??? well... whatever a sport is a sport right, they aren't that different.
@@ -18,15 +18,15 @@ class LabGameConstants:
         # this is not java: I won't write get methods for allat (maybe that I'll need to put a lock on this though)
         # also maybe, I said maybe there will be times when I need to change their value
         self.LAB_SHAPE: np.ndarray[int] = np.array([7, 7], dtype=np.uint16)
-        self.labyrinth: np.ndarray[int] = laby_generator.generate_lab(self.LAB_SHAPE, seed=0)
-        self.EXIT = self.labyrinth[-1]
         self.FRAMERATE: int = 120
-        self.BORDER_WIDTH = 50  # I think that I should stop modifying these values bc otherwise it's gonna fuck everything up
+        self.BORDER_WIDTH = 200
         self.CELL_WIDTH = 2 * self.BORDER_WIDTH  # 600
         self.WALL_WIDTH = self.CELL_WIDTH / 6  # 120
         self.SPEED: float = 5
         self.CAMERABOX_OFFSET: int = 50
         self.SCREEN_RES = np.array([640, 480])
+
+        self.labyrinth: np.ndarray[int] = laby_generator.generate_lab(self.LAB_SHAPE)
         self.lab_array = np.zeros((self.LAB_SHAPE[1], self.LAB_SHAPE[0]), dtype="int16")
         self.branch_array = np.array([0], dtype=np.int16)  # contains the indexes where a new branch start
         prev_value = np.zeros(2)

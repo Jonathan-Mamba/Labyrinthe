@@ -2,14 +2,12 @@
 contient la classe qui représente un point du labyrinthe
 """
 
-import abc
 import typing
 import itertools
 import numpy as np
 import pygame
-from GameCore.constants import LabGameConstants
-from GameCore.sprite.LabSprite import LabSprite
-from GameCore.util.tools import Direction
+from laby.sprite.LabSprite import LabSprite
+from laby.util.tools import Direction
 type coordinate = typing.SupportsIndex[int]
 type point = coordinate
 
@@ -55,7 +53,7 @@ class Cell(LabSprite):
         self.edges: set[tuple[Direction, bool]] = set()
 
     def __repr__(self):
-        return f"<Cell({self.arr_index} at {self.index})>"
+        return f"<Cell({self.index} at {self.arr_index})>"
 
     def copy(self, cell_width: int, lab: np.ndarray[int]) -> typing.Self:
         return Cell(cell_width, lab, self.index, self.rect.topleft, self.color)
@@ -63,9 +61,8 @@ class Cell(LabSprite):
     def get_previous(self, cell_width: int, lab: np.ndarray[int]) -> typing.Self:
         return Cell(cell_width, lab, self.index - 1, self.rect.topleft, self.color)
 
-    def set_color(self, game_consts: LabGameConstants):  # visualizes different branches
-        lab = game_consts.labyrinth
-        var = lab[self.index] - lab[self.get_previous(game_consts.CELL_WIDTH, game_consts.labyrinth).index]
+    def set_color(self, cell_width: int, lab: np.ndarray[int]):  # visualizes different branches
+        var = lab[self.index] - lab[self.get_previous(cell_width, lab).index]
         if sum(abs(var)) > 1:
             Cell.current_color = Cell.colors.__next__()
         self.color = Cell.current_color
