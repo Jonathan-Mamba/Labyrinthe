@@ -1,7 +1,7 @@
 import pygame
 import numpy as np
 from laby.constants import LabGameConstants, LabEngineConstants
-from laby.sprite.player import IdleState, BaseAttackState
+from laby.sprite.entity.player import IdleState, BaseAttackState
 type Event = pygame.event.Event
 
 
@@ -31,4 +31,5 @@ class EngineObserver:
                 self.engine_consts.player.set_state(IdleState)
 
     def debug(self, event: Event, game_consts: LabGameConstants) -> None:
-        print("> debug")
+        if event.key == pygame.K_TAB:
+            print("> debug")

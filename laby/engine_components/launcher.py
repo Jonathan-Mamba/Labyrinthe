@@ -2,9 +2,9 @@ import pygame
 from typing import Callable, Iterable
 from laby.constants import LabGameConstants, LabEngineConstants
 from laby.event.custom import CustomEvent
-from laby.engine_components import EngineObserver
 from laby.util.laby_generator import is_inside, close_points
-from laby.sprite import Cell, Wall, Junction, Player
+from laby.sprite import Cell, Wall, Junction
+from laby.sprite.entity import Player
 from laby.util import tools, misc
 from laby.util.misc import Direction
 from laby.event import EventObserver
@@ -17,7 +17,7 @@ class Launcher:
     def __init__(self, gc: LabGameConstants, ec: LabEngineConstants):
         self.game_constants = gc
         self.engine_constants = ec
-        self.is_inside_rect: Callable[[Iterable[int | float]], bool] = lambda x: is_inside(x, (0, 0), gc.LAB_SHAPE)
+        self.is_inside_lab: Callable[[Iterable[int | float]], bool] = lambda x: is_inside(x, (0, 0), gc.LAB_SHAPE)
 
     def start(self):
         self.engine_constants.surface = pygame.display.set_mode(self.game_constants.SCREEN_RES, pygame.RESIZABLE)
@@ -46,11 +46,11 @@ class Launcher:
 
             # filling cell.edges
             adjacent_cells = [list(reversed(i)) for i in close_points(self.game_constants.labyrinth[cell.index])
-                              if is_inside(i, (0, 0), self.game_constants.LAB_SHAPE)]
+                              if self.is_inside_lab(i)]
             max_index: int = 0
             for i in adjacent_cells:
                 # if i is right next or right before cell in order:
-                if abs(lab_array[*i] - cell.index) <= 1:
+                if abs(lab_array[*i] - cell.index) == 1:
                     cell.edges.add((
                         tools.get_relative_position(cell.arr_index, list(reversed(i))),
                         lab_array[*i] < cell.index
@@ -64,11 +64,7 @@ class Launcher:
 
     def create_junctions(self) -> None:
         cells: list[Cell] = self.engine_constants.cells_group.sprites()
-        # filling cell.edges
         for cell in cells:
-            # write it down on a piece of paper (I know this looks bad)
-
-            # creating Junctions
             for direction, is_before in cell.edges:
                 if is_before:
                     junction_topleft = cell.rect.topleft
@@ -97,11 +93,10 @@ class Launcher:
             cell: Cell = a
             lab_array = self.game_constants.lab_array
             edges: list[int] = list(i[0] for i in cell.edges)
-            is_inside_lab: Callable[[misc.int_pos], bool] = lambda x: is_inside(x, (0, 0), self.game_constants.LAB_SHAPE)
 
             adjacent_branch_cell = None
             for point in close_points(self.game_constants.labyrinth[cell.index]):
-                if is_inside_lab(point):
+                if self.is_inside_lab(point):
                     if lab_array[*point[::-1]] in self.game_constants.branch_array and lab_array[*point[::-1]] > cell.index:
                         adjacent_branch_cell = point
 
@@ -110,7 +105,7 @@ class Launcher:
                 max_index: int = 0
                 for point in close_points(adjacent_branch_cell):
                     # max_index < lab_array[point] < lab_array[adjacent_branch_cell]
-                    if is_inside_lab(point) and max_index < lab_array[*point[::-1]] < lab_array[*adjacent_branch_cell[::-1]]:
+                    if self.is_inside_lab(point) and max_index < lab_array[*point[::-1]] < lab_array[*adjacent_branch_cell[::-1]]:
                         max_index = lab_array[*point[::-1]]
 
                 if max_index == cell.index:

@@ -20,19 +20,13 @@ def close_points(_point: point) -> list:
         [x, y - 1],
     ]
 
-
+# oui cette classe sert a rien mais si je l'enlève ca marche plus
 class LabWalker:
     def __init__(self, point_list: np.ndarray[int], start_point: point, func = lambda x: None) -> None:
         self.point_list = point_list
         self.start_point = start_point
         self.points_dict = {tuple(start_point): True}
         self.func = func
-
-    def generate(self, size: point,  easy_bt: bool = False) -> np.ndarray[int]:
-        return generate_lab(size, self.start_point, easy_bt, walker=self)
-
-    def at_new_cell(self, _point: point):
-        self.func(np.array(_point))
 
 
 def is_inside(_point: point, topleft: point, bottomright: point) -> bool:
@@ -47,17 +41,12 @@ def next_possible_points(walker: LabWalker, topleft: point, bottomright: point, 
     return possible_points
 
 
-_backtrack_count = 0
-
-
 def choose_next_point(walker: LabWalker, size: list) -> point:
-    global _backtrack_count
     next_points: list = next_possible_points(walker, [0, 0], bottomright=size)
     backtrack = 1
 
     while next_points == []:  #si il y a aucun point disponible
         backtrack += 1
-        _backtrack_count += 1
         next_points = next_possible_points(walker, [0, 0], bottomright=size, index=backtrack)
 
     return random.choice(next_points)
@@ -81,13 +70,11 @@ def generate_lab(size: point, start_point=None, progress_bar: bool = False, walk
                 next_point = choose_next_point(walker, size)
                 walker.point_list = np.append(walker.point_list, [next_point], axis=0)
                 walker.points_dict[tuple(next_point)] = True
-                walker.at_new_cell(next_point)
                 bar()
     else:
         for _ in range(AREA - 1):
             next_point = choose_next_point(walker, size)
             walker.point_list = np.append(walker.point_list, [next_point], axis=0)
             walker.points_dict[tuple(next_point)] = True
-            walker.at_new_cell(next_point)
 
     return walker.point_list

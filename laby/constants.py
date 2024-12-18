@@ -1,7 +1,7 @@
 import numpy as np
 import pygame
 from laby.util import laby_generator
-from laby.sprite.player import Player
+from laby.sprite.entity.player import Player
 
 """
 // but you played basketball right? how come you aren't perfect in any other sports??? well... whatever a sport is a sport right, they aren't that different.
