@@ -1,14 +1,14 @@
 import pygame
-import typing as t
+from typing import Callable, Iterable, Type
 from laby.event.custom import CustomEvent
-from laby.sprite.LabSprite import LabSprite
+from laby.sprite.entity import Entity
 from laby.util import tools
 from laby.util.tools import Direction
 
 
 class PlayerState:
     def __init__(self,
-                 state_setter: t.Callable[..., None],
+                 state_setter: Callable[..., None],
                  rect: pygame.Rect,
                  image: pygame.Surface,
                  count: int = 0,
@@ -20,7 +20,11 @@ class PlayerState:
         self.animation_count = count
         self.direction: Direction = direction
 
+    def get_init_args(self) -> tuple:
+        return self.rect, self.image, self.animation_count, self.direction
+
     def animate(self, event: int): ...
+    def update(self): ...
     def on_start(self): ...
     def on_end(self): self.animation_count = 0
 
@@ -47,15 +51,15 @@ class BaseAttackState(PlayerState):
     def animate(self, event: int): pass
 
 
-class Player(LabSprite):
+class Player(Entity):
     SPRITE_SIZE = (25, 21)
     SCALE_FACTOR = 3
 
-    def __init__(self, screen_center: t.Iterable[float | int], *groups: tuple[pygame.sprite.Group]) -> None:
+    def __init__(self, screen_center: Iterable[float | int], *groups: tuple[pygame.sprite.Group]) -> None:
         super().__init__(*groups)
         image = tools.get_image(pygame.image.load("assets/player/idle.png"), (0, 0), Player.SPRITE_SIZE,
                                 Player.SCALE_FACTOR)
-        self._state: PlayerState = IdleState(self.set_state, image.get_rect(center=screen_center), image)
+        self._state: PlayerState = IdleState(self.set_state_type, image.get_rect(center=screen_center), image)
         self._state.on_start()
         self.velocity: pygame.Vector2 = pygame.Vector2()
 
@@ -63,15 +67,21 @@ class Player(LabSprite):
         self.rect.topleft += self.velocity
         self.velocity = pygame.math.Vector2()
 
-    def animate(self, event: pygame.event.Event, *_) -> None:
+    def update(self, *args, **kwargs):
+        self._state.update()
+
+    def animate(self, event: pygame.event.Event, _) -> None:
         self._state.animate(event.type)
 
-    def get_state(self) -> t.Type[PlayerState]:
+    def state_is(self, state_type: type) -> bool:
+        return isinstance(self._state, state_type)
+
+    def get_state_type(self) -> Type[PlayerState]:
         return type(self._state)
 
-    def set_state(self, value: t.Callable[..., PlayerState]) -> None:
+    def set_state_type(self, _class: Callable[..., PlayerState]) -> None:
         self._state.on_end()
-        self._state = value(self.set_state, self.rect, self.image, self._state.animation_count, self._state.direction)
+        self._state = _class(self.set_state_type, *self._state.get_init_args())
         self._state.on_start()
 
     def get_direction(self) -> Direction:
@@ -94,4 +104,4 @@ class Player(LabSprite):
 
     @image.setter
     def image(self, value: pygame.Surface) -> None:
-        self._state.image = value
+        self._state.image = value  # wait why tf would I want to do that ?

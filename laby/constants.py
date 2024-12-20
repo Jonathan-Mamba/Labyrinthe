@@ -1,7 +1,7 @@
-import numpy as np
 import pygame
-from laby.util import laby_generator
+import numpy as np
 from laby.sprite.entity.player import Player
+from laby.util import laby_generator, MetaSingleton
 
 """
 // but you played basketball right? how come you aren't perfect in any other sports??? well... whatever a sport is a sport right, they aren't that different.
@@ -12,14 +12,14 @@ both classes are supposed to be singletons and their instances should be obtaine
 """
 
 
-class LabGameConstants:
+class LabGameConstants(metaclass=MetaSingleton):
     def __init__(self):
         # data that any part of the of game would want and shouldn't be set
         # this is not java: I won't write get methods for allat (maybe that I'll need to put a lock on this though)
         # also maybe, I said maybe there will be times when I need to change their value
         self.LAB_SHAPE: np.ndarray[int] = np.array([7, 7], dtype=np.uint16)
         self.FRAMERATE: int = 120
-        self.BORDER_WIDTH = 200
+        self.BORDER_WIDTH = 50
         self.CELL_WIDTH = 2 * self.BORDER_WIDTH  # 600
         self.WALL_WIDTH = self.CELL_WIDTH / 6  # 120
         self.SPEED: float = 5
@@ -40,6 +40,7 @@ class LabGameConstants:
 class LabEngineConstants:
     def __init__(self):
         # data that only LabGameEngine or event.Observers should normally want
+        # this class isn't a singleton bc it would be possible to create an instance outside LabGameEngine if so
         # P.S.: why is there an autocorrect on a code editor ?
         self.clock: pygame.time.Clock = pygame.time.Clock()
         self.title: str = "delalos"

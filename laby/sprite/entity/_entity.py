@@ -6,8 +6,8 @@ class Entity(LabSprite):
         super().__init__(*groups)
         self._health: float = 10
 
-    def get_health(self) -> float:
-        return self._health
+    @property
+    def health(self) -> float: return self._health
 
-    def set_health(self, value: float) -> None:
-        self._health = value
+    @health.setter
+    def health(self, value: float): self._health = value

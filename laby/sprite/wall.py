@@ -37,3 +37,4 @@ class Wall(LabSprite):
             self.image.fill((0, 0, 0))
             self.image.set_colorkey((0, 0, 0))
         self.rect = self.image.get_rect(topleft=topleft)
+        self.mask: pygame.Mask = pygame.mask.from_surface(self.image)
