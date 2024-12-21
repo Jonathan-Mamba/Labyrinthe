@@ -8,5 +8,5 @@ laby/sprite/__pycache__
 laby/event/__pycache__
 .idea/
 test.py
-laby/constants.py
+laby/game_constants.py
 .gitignore

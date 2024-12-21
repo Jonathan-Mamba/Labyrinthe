@@ -38,7 +38,7 @@ def get_relative_position(a: typing.Iterable, b: typing.Iterable) -> Direction:
     return Direction.NONE
 
 
-def get_inverse_direction(direction: Direction | int) -> Direction:
+def get_inverse(direction: Direction | int) -> Direction:
     return Direction((direction + 4) % 8) if direction != 8 else Direction.NONE
 
 
@@ -60,12 +60,12 @@ class MetaSingleton(type):
         return cls._instances[cls]
 
 
-class AssetsAccessor(metaclass=MetaSingleton):
+class AssetsLoader(metaclass=MetaSingleton):
     def __init__(self):
         with open("assets_map.json") as f:
             self._dict: dict = json.loads(f.read())
 
-    def get_path(self, str_id: str, file_type: str = "png") -> str:
+    def get(self, str_id: str, file_type: str = "png") -> str:
         path = str_id.split('.')
 
         def find_str(_path: list[str], _dict: dict) -> str:
@@ -75,7 +75,7 @@ class AssetsAccessor(metaclass=MetaSingleton):
 
         file_path = find_str(path, self._dict)
         if file_path is None:
-            raise FileExistsError(f"{'.'.join(path)} is not specified")
+            raise FileExistsError(f"{str_id} is not specified")
         elif file_path == "":
             return f"assets/{'/'.join(path)}.{file_type}"
         return "assets/" + file_path

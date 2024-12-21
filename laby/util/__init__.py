@@ -1,1 +1,1 @@
-from .tools import AssetsAccessor, MetaSingleton
+from .tools import AssetsLoader, MetaSingleton

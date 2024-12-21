@@ -1,5 +1,6 @@
 import pygame
 from laby.sprite.LabSprite import LabSprite
+from laby.util import AssetsLoader
 
 
 class Junction(LabSprite):
@@ -12,7 +13,7 @@ class Junction(LabSprite):
         self.image: pygame.Surface = (pygame.Surface(size))
         self.image.fill(color)
         self.image.blit(
-            pygame.transform.scale(pygame.image.load(f"assets/junction/{_str}.png").convert_alpha(), size),
+            pygame.transform.scale(pygame.image.load(AssetsLoader().get(f"junction.{_str}")).convert_alpha(), size),
             (0, 0)
         )
         self.rect = self.image.get_rect(topleft=topleft)

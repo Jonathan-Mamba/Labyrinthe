@@ -2,7 +2,7 @@ import pygame
 from typing import Callable, Iterable, Type
 from laby.event.custom import CustomEvent
 from laby.sprite.entity import Entity
-from laby.util import tools
+from laby.util import tools, AssetsLoader
 from laby.util.tools import Direction
 
 
@@ -12,16 +12,21 @@ class PlayerState:
                  rect: pygame.Rect,
                  image: pygame.Surface,
                  count: int = 0,
-                 direction: Direction = Direction.EAST):
+                 direction: Direction = Direction.EAST,
+                 mask: pygame.Mask = None):
+
+        if mask is None:
+            mask = pygame.Mask(Player.SPRITE_SIZE * Player.SCALE_FACTOR, True)
 
         self.state_setter = state_setter
         self.rect = rect
         self.image = image
         self.animation_count = count
         self.direction: Direction = direction
+        self.mask = mask
 
     def get_init_args(self) -> tuple:
-        return self.rect, self.image, self.animation_count, self.direction
+        return self.rect, self.image, self.animation_count, self.direction, self.mask
 
     def animate(self, event: int): ...
     def update(self): ...
@@ -35,7 +40,7 @@ class IdleState(PlayerState):
             return
 
         self.image = tools.get_image(
-            pygame.image.load(f"assets/player/idle.png").convert_alpha(),
+            pygame.image.load(AssetsLoader().get("player.idle")).convert_alpha(),
             (self.animation_count, tools.get_anticlockwise(self.direction, 2) / 2),
             Player.SPRITE_SIZE,
             Player.SCALE_FACTOR
@@ -52,16 +57,19 @@ class BaseAttackState(PlayerState):
 
 
 class Player(Entity):
-    SPRITE_SIZE = (25, 21)
+    SPRITE_SIZE = pygame.Vector2(25, 21)
     SCALE_FACTOR = 3
 
     def __init__(self, screen_center: Iterable[float | int], *groups: tuple[pygame.sprite.Group]) -> None:
         super().__init__(*groups)
-        image = tools.get_image(pygame.image.load("assets/player/idle.png"), (0, 0), Player.SPRITE_SIZE,
+        image = tools.get_image(pygame.image.load(AssetsLoader().get("player.idle")), (0, 0), Player.SPRITE_SIZE,
                                 Player.SCALE_FACTOR)
         self._state: PlayerState = IdleState(self.set_state_type, image.get_rect(center=screen_center), image)
         self._state.on_start()
         self.velocity: pygame.Vector2 = pygame.Vector2()
+
+    def get_mask(self) -> pygame.Mask:
+        return self._state.mask
 
     def update_velocity(self) -> None:
         self.rect.topleft += self.velocity
@@ -70,7 +78,7 @@ class Player(Entity):
     def update(self, *args, **kwargs):
         self._state.update()
 
-    def animate(self, event: pygame.event.Event, _) -> None:
+    def animate(self, event: pygame.event.Event) -> None:
         self._state.animate(event.type)
 
     def state_is(self, state_type: type) -> bool:
@@ -105,3 +113,4 @@ class Player(Entity):
     @image.setter
     def image(self, value: pygame.Surface) -> None:
         self._state.image = value  # wait why tf would I want to do that ?
+        self.mask = pygame.mask.from_surface(self.image)

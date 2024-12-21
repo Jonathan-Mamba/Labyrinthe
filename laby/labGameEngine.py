@@ -85,7 +85,7 @@ class LabGameEngine:
             self.engine_constants.clock.tick(self.game_constants.FRAMERATE)
             pygame.display.flip()
             for event in pygame.event.get():
-                self.event_subject.notify(event, self.game_constants)
+                self.event_subject.notify(event)
 
 
 if __name__ == "__main__":

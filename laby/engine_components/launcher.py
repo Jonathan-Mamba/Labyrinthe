@@ -1,13 +1,13 @@
 import pygame
+import icecream
 from typing import Callable, Iterable
-from laby.constants import LabGameConstants, LabEngineConstants
+from laby.constants import LabEngineConstants, LabGameConstants
 from laby.event.custom import CustomEvent
 from laby.util.laby_generator import is_inside, close_points
 from laby.sprite import Cell, Wall, Junction
 from laby.sprite.entity import Player
-from laby.util import tools, misc
+from laby.util import tools
 from laby.util.misc import Direction
-from laby.event import EventObserver
 
 
 class Launcher:
@@ -39,9 +39,9 @@ class Launcher:
     def create_cells(self) -> None:
         lab_array = self.game_constants.lab_array
         for index, value in enumerate(self.game_constants.labyrinth):
-            cell = Cell(self.game_constants.CELL_WIDTH, self.game_constants.labyrinth, index=index,
+            cell = Cell(index=index,
                         pos=(value * self.game_constants.CELL_WIDTH + (value * self.game_constants.BORDER_WIDTH)))
-            cell.set_color(self.game_constants.CELL_WIDTH, self.game_constants.labyrinth)
+            cell.set_color()
             self.engine_constants.cells_group.add(cell)
 
             # filling cell.edges
@@ -77,7 +77,8 @@ class Launcher:
                     elif direction == Direction.EAST:
                         junction_topleft = cell.rect.topright
 
-                    # PTN MAIS CA MENERVE CES WARNING CA REND TOUT MOCHE ET JE TROUVE PAS LE MOYEN DE REGLER LE PEOBLEME
+                    # PTN MAIS CA MENERVE CES WARNING CA REND TOUT MOCHE ET JE TROUVE PAS LE MOYEN DE REGLER LE PEOBLEME*
+                    # j'ai trouvé enft il faut que l'ajoute pdt l'init mais la flemme en sah
                     self.engine_constants.junction_group.add(Junction(
                         self.game_constants.CELL_WIDTH,
                         self.game_constants.BORDER_WIDTH,
@@ -88,7 +89,7 @@ class Launcher:
 
     def create_walls(self):
         # TODO: will merge all of the walls into one giant sprite
-        # TODO: write some object or func to transfrom of all the *x[::-1] to func(x) or Index(x)
+        # TODO: write some object or func to transform of all the lab_array[*x[::-1]] to func(x) or Index(x)
         for a in self.engine_constants.cells_group.sprites():
             cell: Cell = a
             lab_array = self.game_constants.lab_array
@@ -111,17 +112,11 @@ class Launcher:
                 if max_index == cell.index:
                     edges.append(tools.get_relative_position(cell.arr_index, adjacent_branch_cell))
 
+            image_size = (self.game_constants.CELL_WIDTH, self.game_constants.CELL_WIDTH)
             if len(edges) == 1:
-                self.engine_constants.wall_group.add(Wall(
-                    cell.rect.topleft, 1,
-                    edges[0], pygame.Vector2(self.game_constants.CELL_WIDTH)
-                ))
+                self.engine_constants.wall_group.add(Wall.from_one(cell.rect.topleft, image_size, edges[0]))
             elif len(edges) == 2:
-                self.engine_constants.wall_group.add(Wall(
-                    cell.rect.topleft, 2,
-                    edges[0], pygame.Vector2(self.game_constants.CELL_WIDTH), edges[1]
-                ))
+                self.engine_constants.wall_group.add(Wall.from_two(cell.rect.topleft, image_size, edges[1], edges[0]))
             elif len(edges) == 3:
                 direction: int = Direction([i for i in (0, 2, 4, 6) if i not in edges][0])  # y'en a qu'un
-                self.engine_constants.wall_group.add(Wall(cell.rect.topleft, 3, direction,
-                                                          pygame.Vector2(self.game_constants.CELL_WIDTH)))
+                self.engine_constants.wall_group.add(Wall.from_three(cell.rect.topleft, image_size, direction))

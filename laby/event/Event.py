@@ -1,15 +1,13 @@
 import pygame
 from typing import Callable
-from laby.constants import LabGameConstants as gameConsts
-from laby.constants import LabEngineConstants as engineConsts
 
 
 class EventObserver:
-    def __init__(self, func: Callable):
+    def __init__(self, func: Callable[[pygame.event.Event], None]):
         self.func = func
 
-    def notify(self, event: pygame.event.Event, game_consts: gameConsts):
-        self.func(event, game_consts)
+    def notify(self, event: pygame.event.Event):
+        self.func(event)
 
 
 class EventSubject:
@@ -26,17 +24,17 @@ class EventSubject:
         pygame.MOUSEWHEEL: [],
     }
 
-    def __init__(self, event_dict: dict[pygame.event.Event, list[EventObserver]] = None) -> None:
+    def __init__(self, event_dict: dict[int, list[EventObserver]] = None) -> None:
         if event_dict is None:
-            self.event_dict = EventSubject.default
+            self.event_dict = EventSubject.default.copy()
         else:
             self.event_dict = event_dict | EventSubject.default  # fuses the dicts with the first one in priority
 
-    def notify(self, event: pygame.event.Event, game_consts: gameConsts) -> None:
+    def notify(self, event: pygame.event.Event) -> None:
         observers = self.event_dict.get(event.type, None)
         if observers:
             for observer in observers:
-                observer.notify(event, game_consts)
+                observer.notify(event)
 
     def add_observer(self, observer: EventObserver, event_type: int) -> bool:
         """returns True if observer is not found, else returns False"""

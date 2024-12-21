@@ -6,6 +6,7 @@ import typing
 import itertools
 import numpy as np
 import pygame
+from laby.game_constants import LabGameConstants
 from laby.sprite.LabSprite import LabSprite
 from laby.util.tools import Direction
 type coordinate = typing.SupportsIndex[int]
@@ -40,14 +41,14 @@ class Cell(LabSprite):
     current_color: pygame.color.Color = pygame.color.Color(255, 0, 255)
     colors.__next__()
 
-    def __init__(self, cell_width: int, labyrinth: np.ndarray[int], index: int, pos: coordinate = [0, 0], color=[255, 255, 255]) -> None:
+    def __init__(self, index: int, pos: coordinate = [0, 0], color=[255, 255, 255]) -> None:
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface([cell_width, cell_width])
+        self.image = pygame.Surface([LabGameConstants().CELL_WIDTH, LabGameConstants().CELL_WIDTH])
         self.image.fill(color)
         self.color = color
         self.rect = self.image.get_rect(topleft=pos)
         self.index = index
-        self.arr_index: np.ndarray[int] = labyrinth[self.index]
+        self.arr_index: np.ndarray[int] = LabGameConstants().labyrinth[self.index]
         # le bool indique si la cellule dans cette direction est avant self
         # juste j'ai eu besion d'un set à un moment mais plus mnt (ca marche menfou)
         self.edges: set[tuple[Direction, bool]] = set()
@@ -55,14 +56,14 @@ class Cell(LabSprite):
     def __repr__(self):
         return f"<Cell({self.index} at {self.arr_index})>"
 
-    def copy(self, cell_width: int, lab: np.ndarray[int]) -> typing.Self:
-        return Cell(cell_width, lab, self.index, self.rect.topleft, self.color)
+    def copy(self) -> typing.Self:
+        return Cell(self.index, self.rect.topleft, self.color)
 
-    def get_previous(self, cell_width: int, lab: np.ndarray[int]) -> typing.Self:
-        return Cell(cell_width, lab, self.index - 1, self.rect.topleft, self.color)
+    def get_previous(self) -> typing.Self:
+        return Cell(self.index - 1, self.rect.topleft, self.color)
 
-    def set_color(self, cell_width: int, lab: np.ndarray[int]):  # visualizes different branches
-        var = lab[self.index] - lab[self.get_previous(cell_width, lab).index]
+    def set_color(self):  # visualizes different branches
+        var = LabGameConstants().labyrinth[self.index] - LabGameConstants().labyrinth[self.get_previous().index]
         if sum(abs(var)) > 1:
             Cell.current_color = Cell.colors.__next__()
         self.color = Cell.current_color
