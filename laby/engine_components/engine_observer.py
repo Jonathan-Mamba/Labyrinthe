@@ -3,6 +3,7 @@ import numpy as np
 from laby.constants import LabEngineConstants, LabGameConstants
 from laby.sprite.entity.player import IdleState, BaseAttackState
 from pprint import pprint
+import icecream
 
 type Event = pygame.event.Event
 
@@ -39,4 +40,8 @@ class EngineObserver:
 
     def debug(self, event: Event) -> None:
         if event.key == pygame.K_TAB:
+
             print(LabGameConstants().lab_array)
+        elif event.key == pygame.K_RETURN:
+            print(self.engine_consts.player.rect.collidelist(
+                [cell.rect for cell in self.engine_consts.cells_group.sprites()]))

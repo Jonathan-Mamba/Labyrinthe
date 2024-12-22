@@ -11,4 +11,4 @@ class Renderer:
         for group in engine_consts.groups:
             group.update(game_consts)
             for sprite in group:
-                engine_consts.surface.blit(sprite.image, -engine_consts.offset + sprite.rect.topleft)
+                engine_consts.surface.blit(sprite.image, sprite.rect.topleft - engine_consts.offset)

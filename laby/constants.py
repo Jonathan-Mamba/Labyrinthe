@@ -1,9 +1,8 @@
 import pygame
 import numpy as np
-from laby.game_constants import LabGameConstants
-
-
 from laby.sprite.entity import Player
+from laby.sprite import Wall, Junction, Cell
+from laby.game_constants import LabGameConstants
 
 
 class LabEngineConstants:
@@ -15,14 +14,15 @@ class LabEngineConstants:
         self.title: str = "delalos"
         self.is_open: bool = False
         self.offset = np.array([0, 0], dtype=np.int16)
+        self.font: pygame.font.Font = pygame.font.SysFont("consolas", 12)
 
         # all of these values are defined in LabGameEngine.at_startup
         self.surface: pygame.surface.Surface = None
         self.camera_rect: pygame.Rect = None
 
-        self.cells_group: pygame.sprite.Group = pygame.sprite.Group()
-        self.wall_group: pygame.sprite.Group = pygame.sprite.Group()
-        self.junction_group: pygame.sprite.Group = pygame.sprite.Group()
+        self.cells_group: pygame.sprite.Group[Cell] = pygame.sprite.Group()
+        self.wall_group: pygame.sprite.Group[Wall] = pygame.sprite.Group()
+        self.junction_group: pygame.sprite.Group[Junction] = pygame.sprite.Group()
         self.player_group: pygame.sprite.GroupSingle = pygame.sprite.GroupSingle()
         self.groups: list[pygame.sprite.Group] = [  # all the groups sorted by depth (drawn from first to last)
             self.cells_group,

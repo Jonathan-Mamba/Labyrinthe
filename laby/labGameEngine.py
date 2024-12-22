@@ -1,15 +1,16 @@
 import pygame
 import icecream
 import numpy as np
-from laby.event import EventSubject, EventObserver, custom
+from laby.event import EventSubject, EventObserver
 from laby.constants import LabGameConstants, LabEngineConstants
-from laby.event.custom import custom_event_dict
+from laby.event.custom import custom_event_dict, CustomEvent
 from laby.util.tools import Direction
 from laby.engine_components import Launcher, EngineObserver, Renderer
 
 
 class LabGameEngine:
     def __init__(self) -> None:
+        pygame.init()
         # None of these are private bc there is and should be NO reference to LabGameEngine
         self.game_constants: LabGameConstants = LabGameConstants()
         self.engine_constants: LabEngineConstants = LabEngineConstants()
@@ -26,9 +27,8 @@ class LabGameEngine:
         x = (
             (self.engine_observer.event_quit, pygame.QUIT),
             (self.engine_observer.video_resize, pygame.VIDEORESIZE),
-            (self.engine_observer.player_key_down, pygame.KEYDOWN),
             (self.engine_observer.debug, pygame.KEYDOWN),
-            (self.engine_constants.player.animate, custom.CustomEvent.PLAYER_IDLE)
+            (self.engine_constants.player.animate, CustomEvent.PLAYER_IDLE)
         )
         for func, event_type in x:
             self.event_subject.add_observer(EventObserver(func), event_type)
@@ -52,8 +52,7 @@ class LabGameEngine:
             self.engine_constants.player.set_direction(Direction.SOUTH)
 
         try:
-            self.engine_constants.player.velocity = (
-                    self.engine_constants.player.velocity.normalize() * self.game_constants.SPEED)
+            self.engine_constants.player.velocity = self.engine_constants.player.velocity.normalize() * self.game_constants.SPEED
         except ValueError:
             pass
 
@@ -77,7 +76,6 @@ class LabGameEngine:
         self.renderer.render(self.game_constants, self.engine_constants)
 
     def main(self) -> None:
-        pygame.init()
         self.at_startup()
         self.engine_constants.is_open = True
         while self.engine_constants.is_open:
