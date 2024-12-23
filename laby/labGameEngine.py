@@ -51,11 +51,6 @@ class LabGameEngine:
             self.engine_constants.player.velocity.y += 1
             self.engine_constants.player.set_direction(Direction.SOUTH)
 
-        try:
-            self.engine_constants.player.velocity = self.engine_constants.player.velocity.normalize() * self.game_constants.SPEED
-        except ValueError:
-            pass
-
         self.engine_constants.player.update_velocity()
         player_rect = self.engine_constants.player.rect
         camera_rect = self.engine_constants.camera_rect
@@ -73,6 +68,11 @@ class LabGameEngine:
 
     def update(self) -> None:
         self.process_movement()
+        for group in self.engine_constants.groups:
+            if group == self.engine_constants.player_group:
+                self.engine_constants.player.update(wall_group=self.engine_constants.wall_group, junction_group=self.engine_constants.junction_group)
+                continue
+            group.update()
         self.renderer.render(self.game_constants, self.engine_constants)
 
     def main(self) -> None:

@@ -42,5 +42,4 @@ class EngineObserver:
         if event.key == pygame.K_TAB:
             print(LabGameConstants().lab_array)
         elif event.key == pygame.K_RETURN:
-            print(self.engine_consts.player.rect.collidelist(
-                [cell.rect for cell in self.engine_consts.cells_group.sprites()]))
+            pass

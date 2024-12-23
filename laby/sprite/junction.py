@@ -11,7 +11,7 @@ class Junction(LabSprite):
     def __init__(self, cell_width: int, border_width: int, color: pygame.Color, vertical: bool, topleft, *groups):
         super().__init__(*groups)
         self.is_vertical = vertical
-        _str: str = "vertical" if vertical else "horizontal"  # jsp j'ai pas compris
+        _str: str = "vertical" if vertical else "horizontal"
         size = (cell_width, border_width) if vertical else (border_width, cell_width)
 
         self.image: pygame.Surface = (pygame.Surface(size))
