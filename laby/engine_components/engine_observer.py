@@ -40,7 +40,6 @@ class EngineObserver:
 
     def debug(self, event: Event) -> None:
         if event.key == pygame.K_TAB:
-
             print(LabGameConstants().lab_array)
         elif event.key == pygame.K_RETURN:
             print(self.engine_consts.player.rect.collidelist(

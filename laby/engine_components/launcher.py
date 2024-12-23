@@ -82,7 +82,7 @@ class Launcher:
                         self.game_constants.CELL_WIDTH,
                         self.game_constants.BORDER_WIDTH,
                         cell.color,
-                        direction in (Direction.WEST, Direction.EAST),
+                        direction in (Direction.NORTH, Direction.SOUTH),
                         junction_topleft,
                         self.engine_constants.junction_group
                     )
@@ -95,8 +95,7 @@ class Launcher:
         for cell in cells:
             edges: list[Direction] = list(cell.direction_edges)
             adjacent_branch_cells = [
-                np.array(point)
-                for point in close_points(cell.arr_index)
+                point for point in close_points(cell.arr_index)
                 if self.is_inside_lab(point)
                 if lab_array.get(point) in self.game_constants.branch_array  # AND
                 if lab_array.get(point) > cell.index  # AND
@@ -108,8 +107,8 @@ class Launcher:
                 continue
 
             if len(adjacent_branch_cells) == 1:
-                # les cellules qui se trouvent après cell dans l'ordre et a coté de adjacent_branch_cell
                 max_index: int = 0
+                # les cellules qui se trouvent après cell dans l'ordre et a coté de adjacent_branch_cell
                 for point in close_points(adjacent_branch_cells[0]):
                     # max_index < lab_array[point] < lab_array[adjacent_branch_cell]
                     if self.is_inside_lab(point) and max_index < lab_array.get(point) < lab_array.get(adjacent_branch_cells[0]):
@@ -127,5 +126,5 @@ class Launcher:
             elif len(edges) == 2:
                 Wall.from_two(cell.rect.topleft, image_size, edges[1], edges[0], self.engine_constants.wall_group)
             elif len(edges) == 3:
-                direction: int = Direction([i for i in (0, 2, 4, 6) if i not in edges][0])  # y'en a qu'un
+                direction: int = [i for i in (0, 2, 4, 6) if i not in edges][0]  # y'en a qu'un
                 Wall.from_three(cell.rect.topleft, image_size, Direction(direction), self.engine_constants.wall_group)
