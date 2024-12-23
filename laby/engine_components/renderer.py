@@ -1,6 +1,5 @@
 import pgtext
 import pygame
-from typing import Sequence
 from laby.constants import LabGameConstants, LabEngineConstants
 
 
@@ -16,5 +15,8 @@ class Renderer:
 
         wall_collision = engine_consts.player.rect.collidelist([i.rect for i in engine_consts.wall_group.sprites()])
         junction_collision = engine_consts.player.rect.collidelist([i.rect for i in engine_consts.junction_group.sprites()])
-        pgtext.draw(f"collided wall: {wall_collision}", (0, 0), owidth=1, ocolor=(0, 0, 0), sysfontname="Segoe UI", fontsize=16)
-        pgtext.draw(f"collided junction: {junction_collision}", (0, 15), owidth=1, ocolor=(0, 0, 0), sysfontname="Segoe UI", fontsize=16)
+        pgtext.drawbox(
+            f"collided wall: {wall_collision}\ncollided junction: {junction_collision}",
+            pygame.Rect(0, 0, 100, 50),
+            owidth=2, ocolor=(0, 0, 0), sysfontname="Segoe UI"
+        )

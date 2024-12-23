@@ -2,7 +2,6 @@ import pygame
 import numpy as np
 from laby.constants import LabEngineConstants, LabGameConstants
 from laby.sprite.entity.player import IdleState, BaseAttackState
-from pprint import pprint
 import icecream
 
 type Event = pygame.event.Event

@@ -41,6 +41,9 @@ class LabGameConstants(metaclass=MetaSingleton):
         self.CAMERABOX_OFFSET: int = 50
         self.SCREEN_RES = np.array([640, 480])
 
+        self.PLAYER_SIZE = pygame.Vector2(25, 21)
+        self.PLAYER_SCALE = 2
+
         self.labyrinth: np.ndarray[Any, int] = laby_generator.generate_lab(self.LAB_SHAPE)
         self.lab_array: LabArray = LabArray(self.LAB_SHAPE[::-1], np.int32)
         self.branch_array = np.array([0], dtype=np.int16)  # contains the indexes where a new branch start
