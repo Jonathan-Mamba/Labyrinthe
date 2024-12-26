@@ -127,4 +127,4 @@ class Launcher:
                 Wall.from_two(cell.rect.topleft, image_size, edges[1], edges[0], self.engine_constants.wall_group)
             elif len(edges) == 3:
                 direction: int = [i for i in (0, 2, 4, 6) if i not in edges][0]  # y'en a qu'un
-                Wall.from_three(cell.rect.topleft, image_size, Direction(direction), self.engine_constants.wall_group)
+                Wall.from_three(cell.rect.topleft, image_size, direction, self.engine_constants.wall_group)

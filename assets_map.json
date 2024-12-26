@@ -1,26 +1,18 @@
 {
-  "junction": {
-    "horizontal": "",
-    "vertical": ""
-  },
+  "junction.horizontal": "",
+  "junction.vertical": "",
 
-  "player": {
-    "idle": ""
-  },
+  "player.idle": "",
 
-  "wall": {
-    "0": null,
-    "1": "wall/1edges_wall.png",
-    "2": {
-      "straight": "wall/2edges_wall_linear.png",
-      "curved": "wall/2edges_wall_angle.png"
-    },
-    "3": "wall/3edges_wall.png",
-    "4": "wall/4edges_wall.png"
-  },
+  "wall.0": null,
+  "wall.1": "wall/1edges_wall.png",
+  "wall.2.straight": "wall/2edges_wall_linear.png",
+  "wall.2.curved": "wall/2edges_wall_angle.png",
+  "wall.3": "wall/3edges_wall.png",
+  "wall.4": "wall/4edges_wall.png",
 
-  "font": {
-    "minecraft": "",
-    "omori": ""
-  }
+  "font.minecraft": "",
+  "font.omori": "",
+
+  "cell": ""
 }

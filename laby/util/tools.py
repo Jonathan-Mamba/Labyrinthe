@@ -66,16 +66,9 @@ class AssetsLoader(metaclass=MetaSingleton):
             self._dict: dict = json.loads(f.read())
 
     def get(self, str_id: str, file_type: str = "png") -> str:
-        path = str_id.split('.')
-
-        def find_str(_path: list[str], _dict: dict) -> str:
-            if len(_path) == 1:
-                return _dict[_path[0]]
-            return find_str(_path[1::], _dict[_path[0]])
-
-        file_path = find_str(path, self._dict)
+        file_path = self._dict[str_id]
         if file_path is None:
             raise FileExistsError(f"{str_id} is not specified")
         elif file_path == "":
-            return f"assets/{'/'.join(path)}.{file_type}"
+            return f"assets/{'/'.join(str_id.split('.'))}.{file_type}"
         return "assets/" + file_path
