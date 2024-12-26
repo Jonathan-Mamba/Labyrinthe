@@ -5,7 +5,7 @@ from laby.event import EventSubject, EventObserver
 from laby.constants import LabGameConstants, LabEngineConstants
 from laby.event.custom import custom_event_dict, CustomEvent
 from laby.util.tools import Direction
-from laby.engine_components import Launcher, EngineObserver, Renderer
+from laby.engine_components import *
 
 
 class LabGameEngine:
@@ -19,6 +19,7 @@ class LabGameEngine:
         self.launcher: Launcher = Launcher(self.game_constants, self.engine_constants)
         self.engine_observer: EngineObserver = EngineObserver(self.engine_constants)
         self.renderer: Renderer = Renderer()
+        self.collision_engine = CollisionEngine(self.engine_constants)
 
     def at_startup(self) -> None:
         self.launcher.start()
@@ -34,6 +35,8 @@ class LabGameEngine:
             self.event_subject.add_observer(EventObserver(func), event_type)
 
     def process_movement(self) -> None:
+        # TODO: move this method somewhere else like Player idk
+        # TODO: ngl I think that I would need to refactor the entire project to do this
         pressed_keys = pygame.key.get_pressed()
         if pressed_keys[pygame.K_LEFT] or pressed_keys[pygame.K_q]:
             self.engine_constants.player.velocity.x -= 1
@@ -51,7 +54,7 @@ class LabGameEngine:
             self.engine_constants.player.velocity.y += 1
             self.engine_constants.player.set_direction(Direction.SOUTH)
 
-        self.engine_constants.player.update_velocity()
+        self.engine_constants.player.update_velocity(CollisionEngine().collides_wall_or_junction)
         player_rect = self.engine_constants.player.rect
         camera_rect = self.engine_constants.camera_rect
 
@@ -69,9 +72,6 @@ class LabGameEngine:
     def update(self) -> None:
         self.process_movement()
         for group in self.engine_constants.groups:
-            if group == self.engine_constants.player_group:
-                self.engine_constants.player.update(wall_group=self.engine_constants.wall_group, junction_group=self.engine_constants.junction_group)
-                continue
             group.update()
         self.renderer.render(self.game_constants, self.engine_constants)
 

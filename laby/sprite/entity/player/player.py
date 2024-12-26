@@ -18,18 +18,16 @@ class Player(Entity):
         self._state: PlayerState = IdleState(self.set_state_type, self.move, image.get_rect(center=screen_center), image)
         self._state.on_start()
 
-    def get_mask(self) -> pygame.Mask:
-        return self._state.mask
-
-    def update_velocity(self) -> None:
+    def update_velocity(self, collides: Callable[[pygame.Rect, pygame.Mask], bool]) -> None:
         try:
-            self.rect.topleft += self.velocity.normalize() * LabGameConstants().SPEED + self._move_operation
+            rect = self.rect.move(*(self.velocity.normalize() * LabGameConstants().SPEED + self._move_operation))
         except ValueError:
-            self.rect.topleft += self._move_operation
+            rect = self.rect.move(*self._move_operation)
+        if not collides(rect, self.get_mask()):  # crating directly a CollisonEngine instance would create a circular import
+            self._state.rect = rect
         self.velocity, self._move_operation = pygame.Vector2(), pygame.Vector2()
 
     def update(self, *args, **kwargs):
-        self.update_velocity()
         self._state.update()
 
     def move(self, xy: float_pos):
@@ -40,6 +38,9 @@ class Player(Entity):
 
     # GETTERS AND SETTERS
     # -------------------------------------------------------------
+    def get_mask(self) -> pygame.Mask:
+        return self._state.mask
+
     def state_is(self, state_type: type) -> bool:
         return isinstance(self._state, state_type)
 
@@ -58,17 +59,7 @@ class Player(Entity):
         self._state.direction = value
 
     @property
-    def rect(self) -> pygame.Rect:
-        return self._state.rect
-
-    @rect.setter
-    def rect(self, value: pygame.Rect) -> None:
-        self._state.rect = value
+    def rect(self) -> pygame.Rect: return self._state.rect
 
     @property
-    def image(self) -> pygame.Surface:
-        return self._state.image
-
-    @image.setter
-    def image(self, value: pygame.Surface) -> None:
-        self._state.image = value  # wait why tf would I want to do that ?
+    def image(self) -> pygame.Surface: return self._state.image

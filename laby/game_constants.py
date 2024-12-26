@@ -34,7 +34,7 @@ class LabGameConstants(metaclass=MetaSingleton):
         #random.seed(0)
         self.LAB_SHAPE = np.array([7, 7], dtype=np.uint16)
         self.FRAMERATE: int = 120
-        self.BORDER_WIDTH = 300 / 6
+        self.BORDER_WIDTH = 300
         self.CELL_WIDTH = 2 * self.BORDER_WIDTH  # 600
         self.WALL_WIDTH = self.CELL_WIDTH / 6  # 120
         self.SPEED: float = 5

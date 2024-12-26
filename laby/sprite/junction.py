@@ -25,6 +25,10 @@ class Junction(LabSprite):
     def __repr__(self) -> str:
         return f"<Junction({self.rect.topleft}, {self.is_vertical})>"
 
+    @property
+    def mask(self) -> pygame.Mask:
+        return self.__class__.get_vertical_mask() if self.is_vertical else self.__class__.get_horizontal_mask()
+
     @classmethod
     def get_vertical_mask(cls) -> pygame.Mask:
         if cls._VERTICAL_MASK is None:

@@ -1,6 +1,8 @@
 import pgtext
 import pygame
 from laby.constants import LabGameConstants, LabEngineConstants
+from laby.util import AssetsLoader
+from .collision_engine import CollisionEngine
 
 
 class Renderer:
@@ -13,10 +15,8 @@ class Renderer:
             for sprite in group:
                 engine_consts.surface.blit(sprite.image, sprite.rect.topleft - engine_consts.offset)
 
-        wall_collision = engine_consts.player.rect.collidelist([i.rect for i in engine_consts.wall_group.sprites()])
-        junction_collision = engine_consts.player.rect.collidelist([i.rect for i in engine_consts.junction_group.sprites()])
-        pgtext.drawbox(
-            f"collided wall: {wall_collision}\ncollided junction: {junction_collision}",
-            pygame.Rect(0, 0, 100, 50),
-            owidth=2, ocolor=(0, 0, 0), sysfontname="Segoe UI"
+        pgtext.draw(
+            f"{CollisionEngine().collides_wall_or_junction(engine_consts.player.rect, engine_consts.player.get_mask())}",
+            (0, 0),
+            antialias=False, fontname=AssetsLoader().get("font.minecraft", "ttf"), fontsize=14, background=(0, 0, 0)
         )

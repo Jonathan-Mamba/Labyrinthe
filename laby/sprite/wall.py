@@ -23,10 +23,10 @@ class Wall(LabSprite):
         this is supposed to be a private constructor so use the static methods pls
         """
         super().__init__(*groups)
-        self.image: pygame.Surface = image
-        self.rect: pygame.Rect = self.image.get_rect(topleft=topleft)
-        self.mask: pygame.Mask = pygame.mask.from_surface(self.image)
-        self.type: float = wall_type  # 0 -> 0, 1 -> 1, 2.0 -> 2.straight, 2.5 -> 2.curved, 3 -> 3, 4 -> 4
+        self.image = image
+        self.rect = self.image.get_rect(topleft=topleft)
+        self.mask = pygame.mask.from_surface(self.image)
+        self.type = wall_type  # 0 -> 0, 1 -> 1, 2.0 -> 2.straight, 2.5 -> 2.curved, 3 -> 3, 4 -> 4, 5 -> null
         self.direction = Direction(_dir)
 
     def __repr__(self) -> str:
@@ -41,7 +41,7 @@ class Wall(LabSprite):
                             pygame.image.load(AssetsLoader().get("wall.1")).convert_alpha(), rotation_angle
                         ), image_size
                     ),
-                    1.0, direction, *groups
+                    1., direction, *groups
                     )
 
     @staticmethod
@@ -61,7 +61,7 @@ class Wall(LabSprite):
                         pygame.transform.rotate(
                             pygame.image.load(path).convert_alpha(), rotation_angle
                         ), image_size
-                    ), 2 if tools.get_inverse(origin) == direction else 2.5, direction, *groups
+                    ), 2. if tools.get_inverse(origin) == direction else 2.5, direction, *groups
                     )
 
     @staticmethod
@@ -72,7 +72,7 @@ class Wall(LabSprite):
                         pygame.transform.rotate(
                             pygame.image.load(AssetsLoader().get("wall.3")).convert_alpha(), rotation_angle
                         ), image_size
-                    ), 3, direction, *groups
+                    ), 3., direction, *groups
                     )
 
     @staticmethod
@@ -80,7 +80,7 @@ class Wall(LabSprite):
         return Wall(topleft,
                     pygame.transform.scale(
                         pygame.image.load(AssetsLoader().get("wall.4")).convert_alpha(), image_size
-                    ), 4, Direction.NONE, *groups
+                    ), 4., Direction.NONE, *groups
                     )
 
     @staticmethod
@@ -88,5 +88,5 @@ class Wall(LabSprite):
         return Wall(topleft,
                     pygame.transform.scale(
                         pygame.image.load(AssetsLoader().get("wall.0")).convert_alpha(), image_size
-                    ), 0, Direction.NONE, *groups
+                    ), 0., Direction.NONE, *groups
                     )

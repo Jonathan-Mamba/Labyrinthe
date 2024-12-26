@@ -1,6 +1,5 @@
 import random
 import numpy as np
-import alive_progress
 from typing import Any
 from colorama import Fore
 type point = list[int] | np.ndarray[Any, int] | tuple[int, int]
@@ -52,7 +51,7 @@ def choose_next_point(walker: LabWalker, size: list) -> point:
     return random.choice(next_points)
 
 
-def generate_lab(size: point, start_point=None, progress_bar: bool = False) -> np.ndarray[Any, int]:
+def generate_lab(size: point, start_point=None) -> np.ndarray[tuple[int, int], int]:
     """
     retourne une liste de coordonnées qui permet de générer un labyrinthe dans un repère avec [0, 0] le point le plus en haut à gauche du plan.
     """
@@ -61,18 +60,9 @@ def generate_lab(size: point, start_point=None, progress_bar: bool = False) -> n
 
     walker: LabWalker = LabWalker(point_list=np.array([start_point], dtype="int16"), start_point=start_point)
     AREA = size[0] * size[1]
-    if progress_bar:
-        with alive_progress.alive_bar(AREA, title="Génération du plan du labyrinthe") as bar:
-            bar()
-            for _ in range(AREA - 1):
-                next_point = choose_next_point(walker, size)
-                walker.point_list = np.append(walker.point_list, [next_point], axis=0)
-                walker.points_dict[tuple(next_point)] = True
-                bar()
-    else:
-        for _ in range(AREA - 1):
-            next_point = choose_next_point(walker, size)
-            walker.point_list = np.append(walker.point_list, [next_point], axis=0)
-            walker.points_dict[tuple(next_point)] = True
+    for _ in range(AREA - 1):
+        next_point = choose_next_point(walker, size)
+        walker.point_list = np.append(walker.point_list, [next_point], axis=0)
+        walker.points_dict[tuple(next_point)] = True
 
     return walker.point_list

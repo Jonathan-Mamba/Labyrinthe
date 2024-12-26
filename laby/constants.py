@@ -1,14 +1,13 @@
 import pygame
 import numpy as np
 from laby.sprite.entity import Player
-from laby.sprite import Wall, Junction, Cell
 from laby.game_constants import LabGameConstants
 
 
 class LabEngineConstants:
     def __init__(self):
         # data that only LabGameEngine or event.Observers should normally want
-        # this class isn't a singleton bc it would be possible to create an instance outside LabGameEngine if so
+        # this class isn't a real singleton bc it would be possible to create a valid instance outside LabGameEngine if so
         # P.S.: why is there an autocorrect on a code editor ?
         self.clock: pygame.time.Clock = pygame.time.Clock()
         self.title: str = "delalos"
@@ -20,9 +19,9 @@ class LabEngineConstants:
         self.surface: pygame.surface.Surface = None
         self.camera_rect: pygame.Rect = None
 
-        self.cells_group: pygame.sprite.Group[Cell] = pygame.sprite.Group()
-        self.wall_group: pygame.sprite.Group[Wall] = pygame.sprite.Group()
-        self.junction_group: pygame.sprite.Group[Junction] = pygame.sprite.Group()
+        self.cells_group: pygame.sprite.Group = pygame.sprite.Group()
+        self.wall_group: pygame.sprite.Group = pygame.sprite.Group()
+        self.junction_group: pygame.sprite.Group = pygame.sprite.Group()
         self.player_group: pygame.sprite.GroupSingle = pygame.sprite.GroupSingle()
         self.groups: list[pygame.sprite.Group] = [  # all the groups sorted by depth (drawn from first to last)
             self.cells_group,

@@ -3,9 +3,11 @@
     "horizontal": "",
     "vertical": ""
   },
+
   "player": {
     "idle": ""
   },
+
   "wall": {
     "0": null,
     "1": "wall/1edges_wall.png",
@@ -15,5 +17,10 @@
     },
     "3": "wall/3edges_wall.png",
     "4": "wall/4edges_wall.png"
+  },
+
+  "font": {
+    "minecraft": "",
+    "omori": ""
   }
 }
