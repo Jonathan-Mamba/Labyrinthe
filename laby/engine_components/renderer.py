@@ -1,8 +1,6 @@
 import time
 import pgtext
 import pygame
-from pygments.styles.dracula import background
-
 from laby.constants import LabGameConstants, LabEngineConstants, GameState
 from laby.util import AssetsLoader
 from .collision_engine import CollisionEngine

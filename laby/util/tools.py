@@ -52,7 +52,7 @@ def get_anticlockwise(direction: Direction | int, times: int) -> Direction:
 
 class MetaSingleton(type):
     _instances = {}
-    # jsp j'ai copié le code je peux pas expliquer
+    # idk copied the code can't explain
     def __call__(cls, *args, **kwargs):
         if cls not in cls._instances:
             instance = super().__call__(*args, **kwargs)
