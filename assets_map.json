@@ -14,5 +14,7 @@
   "font.minecraft": "",
   "font.omori": "",
 
-  "cell": ""
+  "cell.first": "",
+  "cell.default": "",
+  "cell.last": ""
 }

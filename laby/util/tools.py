@@ -70,5 +70,5 @@ class AssetsLoader(metaclass=MetaSingleton):
         if file_path is None:
             raise FileExistsError(f"{str_id} is not specified")
         elif file_path == "":
-            return f"assets/{'/'.join(str_id.split('.'))}.{file_type}"
+            return f"assets/{str_id.replace('.', '/')}.{file_type}"
         return "assets/" + file_path

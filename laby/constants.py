@@ -1,7 +1,16 @@
+import enum
 import pygame
 import numpy as np
 from laby.sprite.entity import Player
+from laby.sprite import Cell
 from laby.game_constants import LabGameConstants
+
+
+class GameState(enum.Enum):
+    RUNNING = enum.auto()
+    MENU = enum.auto()
+    GAME_LOST = enum.auto()
+    GAME_WON = enum.auto()
 
 
 class LabEngineConstants:
@@ -13,11 +22,14 @@ class LabEngineConstants:
         self.title: str = "delalos"
         self.is_open: bool = False
         self.offset = np.array([0, 0], dtype=np.int16)
-        self.font: pygame.font.Font = pygame.font.SysFont("consolas", 12)
+        self.max_traversal_duration = 100 # seconds
+        self.state: GameState = GameState.RUNNING
 
         # all of these values are defined in LabGameEngine.at_startup
         self.surface: pygame.surface.Surface = None
         self.camera_rect: pygame.Rect = None
+        self.start_time: int = None
+        self.last_cell: Cell = None
 
         self.cells_group: pygame.sprite.Group = pygame.sprite.Group()
         self.wall_group: pygame.sprite.Group = pygame.sprite.Group()

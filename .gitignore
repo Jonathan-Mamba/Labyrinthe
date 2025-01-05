@@ -9,4 +9,5 @@ laby/event/__pycache__
 .idea/
 test.py
 laby/game_constants.py
+.venv/
 .gitignore

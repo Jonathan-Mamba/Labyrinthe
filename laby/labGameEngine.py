@@ -1,8 +1,10 @@
+import math
+import time
 import pygame
 import icecream
 import numpy as np
 from laby.event import EventSubject, EventObserver
-from laby.constants import LabGameConstants, LabEngineConstants
+from laby.constants import LabGameConstants, LabEngineConstants, GameState
 from laby.event.custom import custom_event_dict, CustomEvent
 from laby.util.tools import Direction
 from laby.engine_components import *
@@ -33,6 +35,7 @@ class LabGameEngine:
         )
         for func, event_type in x:
             self.event_subject.add_observer(EventObserver(func), event_type)
+        self.engine_constants.start_time = math.floor(time.time())
 
     def process_movement(self) -> None:
         # TODO: move this method somewhere else like Player idk
@@ -73,6 +76,13 @@ class LabGameEngine:
         self.process_movement()
         for group in self.engine_constants.groups:
             group.update()
+
+        if self.engine_constants.state == GameState.RUNNING:
+           if self.engine_constants.player.rect.colliderect(self.engine_constants.last_cell.rect):
+               self.engine_constants.state = GameState.GAME_WON
+           elif round(time.time()) > self.engine_constants.start_time + self.engine_constants.max_traversal_duration:
+               self.engine_constants.state = GameState.GAME_LOST
+
         self.renderer.render(self.game_constants, self.engine_constants)
 
     def main(self) -> None:

@@ -36,7 +36,10 @@ class Launcher:
         self.create_cells()
         self.create_junctions()
         self.create_walls()
+
         self.engine_constants.player_group.sprite = Player(self.engine_constants.cells_group.sprites()[0].rect.center)
+        self.engine_constants.last_cell = self.engine_constants.cells_group.sprites()[-1]
+        self.engine_constants.last_cell.image.fill(pygame.Color("white"))
 
     def create_cells(self) -> None:
         lab_array = self.game_constants.lab_array
