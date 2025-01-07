@@ -1,6 +1,7 @@
-# simple python maze game idk   
+# Labyrinthe
+simple python maze game idk   
 
-**dependencies**:
+## dependencies:
 - icecream
 - colorama
 - pygame
