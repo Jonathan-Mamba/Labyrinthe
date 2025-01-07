@@ -1,4 +1,4 @@
-#simple python maze game idk   
+# simple python maze game idk   
 
 **dependencies**:
 - icecream
