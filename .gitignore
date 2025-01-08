@@ -1,6 +1,5 @@
 *.ipynb
-vieux trucs
-assets/
+vieux truc
 __pycache__
 laby/__pycache__
 laby/util/__pycache__
