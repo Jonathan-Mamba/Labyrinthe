@@ -57,7 +57,7 @@ class LabGameEngine:
             self.engine_constants.player.velocity.y += 1
             self.engine_constants.player.set_direction(Direction.SOUTH)
 
-        self.engine_constants.player.update_velocity(CollisionEngine().collides_wall_or_junction)
+        self.engine_constants.player.update_velocity()
         player_rect = self.engine_constants.player.rect
         camera_rect = self.engine_constants.camera_rect
 

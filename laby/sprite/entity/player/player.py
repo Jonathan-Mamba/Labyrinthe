@@ -18,12 +18,14 @@ class Player(Entity):
         self._state: PlayerState = IdleState(self.set_state_type, self.move, image.get_rect(center=screen_center), image)
         self._state.on_start()
 
-    def update_velocity(self, collides: Callable[[pygame.Rect, pygame.Mask], bool]) -> None:
+    def update_velocity(self) -> None:
+        # ALL MY HOMIES HATE CYCLIC IMPORTS
+        from laby.engine_components import CollisionEngine # Yes you read right. What are you going to do anyway ?
         try:
             rect = self.rect.move(*(self.velocity.normalize() * LabGameConstants().SPEED + self._move_operation))
         except ValueError:
             rect = self.rect.move(*self._move_operation)
-        if not collides(rect, self.get_mask()):  # crating directly a CollisonEngine instance would create a circular import
+        if not CollisionEngine().collides_wall_or_junction(rect, self.get_mask()):
             self._state.rect = rect
         self.velocity, self._move_operation = pygame.Vector2(), pygame.Vector2()
 
